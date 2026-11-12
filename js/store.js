@@ -1,5 +1,6 @@
 import { isDemoMode as modeFromConfig, keyLooksLikeServiceRole, readConfig } from "./config-state.js";
 import { demoProfile, normalizeProfile, profileIssues, starterProfile, validateUsername } from "./model.js";
+import { editorRedirectUrl } from "./route.js";
 
 const STORAGE = "ghostlinks.profile.v1";
 let clientPromise = null;
@@ -105,12 +106,10 @@ export async function currentSession() {
 
 export async function signInWithDiscord() {
   const supabase = await getClient();
-  const redirectTo = new URL("editor.html", window.location.href);
-  redirectTo.search = "";
-  redirectTo.hash = "";
+  const redirectTo = editorRedirectUrl(window.location.origin, window.location.pathname, window.location.hostname);
   const { error } = await supabase.auth.signInWithOAuth({
     provider: "discord",
-    options: { redirectTo: redirectTo.href, scopes: "identify email" }
+    options: { redirectTo, scopes: "identify email" }
   });
   if (error) throw error;
 }
@@ -120,6 +119,7 @@ export async function signOut() {
   if (supabase) await supabase.auth.signOut();
 }
 
+const PROFILES = "ghostlinks_profiles";
 const PROFILE_COLUMNS = "username,display_name,bio,avatar_url,theme,background,accent_color,font,links,youtube_tracks,enter_screen,published";
 
 export async function loadOwn(session) {
@@ -129,7 +129,7 @@ export async function loadOwn(session) {
     return { profile: starterProfile(), persistedUsername: "" };
   }
   const supabase = await getClient();
-  const { data, error } = await supabase.from("profiles").select(PROFILE_COLUMNS).eq("id", session.user.id).maybeSingle();
+  const { data, error } = await supabase.from(PROFILES).select(PROFILE_COLUMNS).eq("id", session.user.id).maybeSingle();
   if (error) throw error;
   if (!data) {
     const meta = session.user.user_metadata || {};
@@ -159,7 +159,7 @@ export async function loadPublic(username) {
   }
   const supabase = await getClient();
   const { data, error } = await supabase
-    .from("profiles")
+    .from(PROFILES)
     .select(PROFILE_COLUMNS)
     .eq("username", check.username)
     .eq("published", true)
@@ -176,7 +176,7 @@ export async function usernameAvailable(candidate, ownUsername = "") {
   }
   if (isDemoMode()) return { ok: true, username: check.username, code: "available", message: "Available in this demo." };
   const supabase = await getClient();
-  const { data, error } = await supabase.rpc("username_available", { candidate: check.username });
+  const { data, error } = await supabase.rpc("ghostlinks_username_available", { candidate: check.username });
   if (error) return { ok: false, username: check.username, code: "error", message: "Couldn't check that username just now." };
   if (data === true) return { ok: true, username: check.username, code: "available", message: "Available." };
   return { ok: false, username: check.username, code: "taken", message: "That username is taken." };
@@ -196,7 +196,7 @@ export async function saveProfile(raw, session) {
     return clean;
   }
   const supabase = await getClient();
-  const { error } = await supabase.from("profiles").upsert(toRow(clean, session.user.id));
+  const { error } = await supabase.from(PROFILES).upsert(toRow(clean, session.user.id));
   if (error) {
     if (/duplicate|unique/i.test(error.message || "")) throw new Error("That username was just claimed.");
     throw new Error(error.message || "Couldn't save your page.");
