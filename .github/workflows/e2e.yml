@@ -1,31 +1,51 @@
 name: e2e
 
+# - pull_request:      test the PR checkout on a local static server (no deploy needed).
+# - deployment_status: GitHub Pages finished deploying a commit; test the live site.
+#                      wait-for-deploy.js still polls until the live files match the commit.
+# - workflow_dispatch: test the live site by hand.
 on:
-  push:
+  pull_request:
     branches: [GhsotFace]
+  deployment_status:
   workflow_dispatch:
-
-concurrency:
-  group: e2e-${{ github.ref }}
-  cancel-in-progress: true
+    inputs:
+      wait_for_deploy:
+        description: Wait until Pages serves this commit before testing
+        type: boolean
+        default: true
 
 permissions:
   contents: read
+  pages: read
 
 jobs:
   smoke:
-    name: Playwright smoke
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
+    name: Playwright (${{ github.event_name == 'pull_request' && 'local' || 'live' }})
+    # Only successful github-pages deployments; other deployment statuses are skipped.
+    if: >-
+      github.event_name != 'deployment_status' ||
+      (github.event.deployment_status.state == 'success' &&
+       github.event.deployment.environment == 'github-pages')
+    concurrency:
+      group: e2e-${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || 'live' }}
+      cancel-in-progress: true
+    # Pinned: ubuntu-latest moved to 26.04, which Playwright 1.56 can't install deps for.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
     defaults:
       run:
         working-directory: tests/e2e
+    env:
+      CI: true
     steps:
       - name: Check out
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
 
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 22
           cache: npm
@@ -37,17 +57,27 @@ jobs:
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
 
-      - name: Run smoke tests
+      - name: Run tests (local server, PR checkout)
+        if: github.event_name == 'pull_request'
+        run: npx playwright test
+        env:
+          E2E_LOCAL: "1"
+          E2E_PORT: "4317"
+
+      - name: Run tests (live site)
+        if: github.event_name != 'pull_request'
         run: npx playwright test
         env:
           BASE_URL: https://ghostfacemodz.github.io/ghostlinks/
-          CI: true
+          EXPECT_SHA: ${{ (github.event_name != 'workflow_dispatch' || inputs.wait_for_deploy) && (github.event.deployment.sha || github.sha) || '' }}
+          GITHUB_TOKEN: ${{ github.token }}
+          DEPLOY_TIMEOUT_MS: "600000"
 
       - name: Upload artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: e2e-artifacts
+          name: e2e-artifacts-${{ github.event_name }}-${{ github.run_attempt }}
           path: |
             tests/e2e/artifacts
             tests/e2e/playwright-report
