@@ -9,8 +9,7 @@
 
 /* ---------- splash variants ---------- */
 .entrance[data-splash="glitch"] .splash-name { animation: look-glitch .7s steps(2, end) infinite; }
-.entrance[data-splash="neon"] .splash-name,
-.entrance[data-splash="neon"] .enter-tag { animation: look-neon 1.4s steps(2, end) infinite; }
+.entrance[data-splash="neon"] .splash-name { animation: look-neon 1.4s steps(2, end) infinite; }
 .entrance[data-splash="smoke"] .splash-stage { background: radial-gradient(circle, #ffffff22, transparent 60%); filter: blur(8px); animation: look-smoke 4s ease-in-out infinite; }
 .entrance[data-splash="smoke"] .splash-name { animation: look-clear 2.4s ease both; }
 .entrance[data-splash="burst"] .splash-ghost::after {
