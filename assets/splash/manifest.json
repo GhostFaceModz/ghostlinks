@@ -278,5 +278,173 @@
       "stars",
       "dark"
     ]
+  },
+  {
+    "id": "splash-21",
+    "file": "splash-21.webp",
+    "thumb": "thumbs/splash-21.webp",
+    "name": "Blood Moon",
+    "tags": [
+      "moon",
+      "blood",
+      "red",
+      "gothic",
+      "night",
+      "dark"
+    ]
+  },
+  {
+    "id": "splash-22",
+    "file": "splash-22.webp",
+    "thumb": "thumbs/splash-22.webp",
+    "name": "Ice Neon Tunnel",
+    "tags": [
+      "ice",
+      "neon",
+      "tunnel",
+      "cyan",
+      "frost",
+      "dark"
+    ]
+  },
+  {
+    "id": "splash-23",
+    "file": "splash-23.webp",
+    "thumb": "thumbs/splash-23.webp",
+    "name": "Golden Clouds",
+    "tags": [
+      "clouds",
+      "gold",
+      "sky",
+      "rays",
+      "luxury",
+      "dark"
+    ]
+  },
+  {
+    "id": "splash-24",
+    "file": "splash-24.webp",
+    "thumb": "thumbs/splash-24.webp",
+    "name": "Galaxy Swirl",
+    "tags": [
+      "galaxy",
+      "swirl",
+      "space",
+      "purple",
+      "stars",
+      "cosmic"
+    ]
+  },
+  {
+    "id": "splash-25",
+    "file": "splash-25.webp",
+    "thumb": "thumbs/splash-25.webp",
+    "name": "Toxic Glow",
+    "tags": [
+      "toxic",
+      "green",
+      "fog",
+      "neon",
+      "glow",
+      "dark"
+    ]
+  },
+  {
+    "id": "splash-26",
+    "file": "splash-26.webp",
+    "thumb": "thumbs/splash-26.webp",
+    "name": "Pastel Dreamscape",
+    "tags": [
+      "pastel",
+      "dream",
+      "clouds",
+      "pink",
+      "lilac",
+      "night"
+    ]
+  },
+  {
+    "id": "splash-27",
+    "file": "splash-27.webp",
+    "thumb": "thumbs/splash-27.webp",
+    "name": "Tokyo Rooftop",
+    "tags": [
+      "tokyo",
+      "rooftop",
+      "city",
+      "neon",
+      "night",
+      "rain"
+    ]
+  },
+  {
+    "id": "splash-28",
+    "file": "splash-28.webp",
+    "thumb": "thumbs/splash-28.webp",
+    "name": "Cosmic Jellyfish",
+    "tags": [
+      "jellyfish",
+      "cosmic",
+      "space",
+      "teal",
+      "violet",
+      "dark"
+    ]
+  },
+  {
+    "id": "splash-29",
+    "file": "splash-29.webp",
+    "thumb": "thumbs/splash-29.webp",
+    "name": "Arcade Neon",
+    "tags": [
+      "arcade",
+      "neon",
+      "pink",
+      "blue",
+      "retro",
+      "dark"
+    ]
+  },
+  {
+    "id": "splash-30",
+    "file": "splash-30.webp",
+    "thumb": "thumbs/splash-30.webp",
+    "name": "Ocean Lightning",
+    "tags": [
+      "ocean",
+      "lightning",
+      "storm",
+      "sea",
+      "teal",
+      "dark"
+    ]
+  },
+  {
+    "id": "splash-31",
+    "file": "splash-31.webp",
+    "thumb": "thumbs/splash-31.webp",
+    "name": "Gold Dust",
+    "tags": [
+      "gold",
+      "dust",
+      "particles",
+      "black",
+      "minimal",
+      "luxury"
+    ]
+  },
+  {
+    "id": "splash-32",
+    "file": "splash-32.webp",
+    "thumb": "thumbs/splash-32.webp",
+    "name": "CRT Static",
+    "tags": [
+      "crt",
+      "static",
+      "noise",
+      "scanline",
+      "glitch",
+      "dark"
+    ]
   }
 ]
