@@ -48,8 +48,6 @@ test.describe("phone layout fits a 390px screen", () => {
   });
 
   test("editor form (demo mode) has no horizontal overflow", async ({ page }) => {
-    // TODO: remove when fixed. editor form is 414px wide on a 390px phone (right column cut off)
-    knownBug("editor form is 414px wide on a 390px phone (right column cut off)");
     await useDemoMode(page);
     await page.goto(appUrl("editor.html"), { waitUntil: "load" });
     await expect(page.locator(".splash-presets")).toBeVisible({ timeout: 20_000 });
@@ -82,8 +80,6 @@ test.describe("third-party loading", () => {
   });
 
   test("?u=demo loads no YouTube thumbnails (ytimg) before the enter click", async ({ page }) => {
-    // TODO: remove when fixed. the YouTube facade loads i.ytimg.com/hqdefault.jpg before enter
-    knownBug("the YouTube facade loads i.ytimg.com/hqdefault.jpg before enter");
     const watch = watchPage(page);
     await page.goto(appUrl("?u=demo"), { waitUntil: "load" });
     await expect(page.getByRole("button", { name: /click to enter/i })).toBeVisible({ timeout: 20_000 });
@@ -93,8 +89,6 @@ test.describe("third-party loading", () => {
   });
 
   test("landing page makes no Supabase requests", async ({ page }) => {
-    // TODO: remove when fixed. landing.js imports store.js, which loads supabase-js from jsdelivr on the landing page
-    knownBug("landing.js imports store.js, which loads supabase-js from jsdelivr on the landing page");
     const watch = watchPage(page);
     await page.goto(appUrl("./"), { waitUntil: "load" });
     await page.waitForTimeout(1000);
@@ -114,8 +108,6 @@ test.describe("third-party loading", () => {
 
 test.describe("images", () => {
   test("editor splash gallery images are lazy (not all fetched on open)", async ({ page }) => {
-    // TODO: remove when fixed. editor fetches all 20 full-size splash images (~3.6 MB) on open, no loading=lazy or thumbnails
-    knownBug("editor fetches all 20 full-size splash images (~3.6 MB) on open, no loading=lazy or thumbnails");
     const watch = watchPage(page);
     await useDemoMode(page);
     await page.goto(appUrl("editor.html"), { waitUntil: "load" });
@@ -152,8 +144,6 @@ test.describe("images", () => {
 
 test.describe("copy", () => {
   test("visit counter says '1 visit' (singular) on a first visit", async ({ page }) => {
-    // TODO: remove when fixed. visit counter says '1 visits' (page.js always appends 'visits')
-    knownBug("visit counter says '1 visits' (page.js always appends 'visits')");
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto(appUrl("?u=demo"), { waitUntil: "load" });
     const enter = page.getByRole("button", { name: /click to enter/i });

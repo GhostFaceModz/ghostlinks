@@ -41,19 +41,27 @@
 .gl-page .splash-brand { position: absolute; top: max(16px, env(safe-area-inset-top)); display: flex; gap: 8px; align-items: center; letter-spacing: .22em; font-family: var(--font-display); font-size: 12px; }
 .gl-page .enter-button { display: flex; flex-direction: column; align-items: center; background: none; border: 0; color: inherit; padding: 0; }
 .gl-page .splash-ghost { position: relative; display: grid; place-items: center; width: min(68vw, 280px); aspect-ratio: 1; color: #f7f4ff; animation: ghost-bob 5s ease-in-out infinite; }
-.gl-page .ghost-svg { width: 78%; height: 78%; filter: drop-shadow(0 18px 30px color-mix(in srgb, var(--accent) 65%, transparent)); }
-.gl-page .halo { position: absolute; inset: 12%; border-radius: 50%; background: radial-gradient(circle, color-mix(in srgb, var(--accent) 55%, transparent), transparent 68%); filter: blur(8px); animation: halo 4s ease-in-out infinite; }
+.gl-page .ghost-svg { width: 78%; height: 78%; filter: drop-shadow(0 0 22px #8f6cff); }
+.gl-page .logo-img { display: none; width: 78%; height: 78%; object-fit: contain; background: none; border: 0; mix-blend-mode: lighten; filter: drop-shadow(0 0 18px color-mix(in srgb, var(--accent) 75%, transparent)); }
+.gl-page .splash-ghost.has-logo .ghost-svg,
+.gl-page .splash-ghost.has-logo .ring { visibility: hidden; }
+.gl-page .splash-ghost.has-logo .logo-img { display: block; }
+.gl-page .logo-img[hidden] { display: none !important; }
+.entrance.has-photo .logo-img { mix-blend-mode: screen; }
+.gl-page .card-logo { display: block; width: 132px; height: 132px; margin: -36px auto -8px; object-fit: contain; background: none; border: 0; mix-blend-mode: lighten; filter: drop-shadow(0 0 16px color-mix(in srgb, var(--accent) 70%, transparent)); animation: ghost-bob 5s ease-in-out infinite; }
+.gl-page .card-logo[hidden] { display: none !important; }
+.gl-page .halo { position: absolute; inset: 12%; border-radius: 50%; background: radial-gradient(circle, rgba(143, 108, 255, .72), transparent 68%); animation: halo 3.4s ease-in-out infinite; }
 .gl-page .ring { position: absolute; width: 68%; height: 68%; border-radius: 50%; border: 1.5px solid color-mix(in srgb, var(--accent) 70%, white); animation: ring-pulse 3.2s ease-out infinite; }
 .gl-page .ring-two { animation-delay: -1.6s; }
 .gl-page .splash-name, .gl-page .profile-name {
-  background: linear-gradient(100deg, #fff 10%, #efe9ff 42%, var(--accent) 78%, #fff 100%);
+  background: linear-gradient(100deg, #fff 8%, #e9e4ff 36%, #8f6cff 72%, #36c8ff);
   -webkit-background-clip: text; background-clip: text; color: transparent;
 }
 .gl-page .splash-handle, .gl-page .enter-hint, .gl-page .splash-note { color: var(--muted); letter-spacing: .08em; }
 .gl-page .splash-note { position: absolute; bottom: max(16px, env(safe-area-inset-bottom)); margin: 0; font-size: 12px; }
 .gl-page .pill-wrap { margin-top: 22px; }
-.gl-page .enter-pill { display: inline-block; padding: 1px; border-radius: 999px; background: conic-gradient(from 90deg, var(--accent), #fff, var(--accent)); }
-.gl-page .enter-tag { display: block; padding: 12px 22px; border-radius: inherit; background: #0a0812; letter-spacing: .18em; text-transform: uppercase; font-size: 13px; }
+.gl-page .enter-pill { display: inline-block; padding: 0; border-radius: 999px; background: linear-gradient(100deg, #6d4dff, #8f6cff 48%, #c4b5fd); animation: pill-ring 2.4s ease-out infinite; }
+.gl-page .enter-tag { display: block; padding: 14px 22px; border-radius: inherit; background: transparent; color: #fff; letter-spacing: .18em; text-transform: uppercase; font-size: 13px; }
 .gl-page .entrance.leaving .splash-ghost { animation: ghost-away 1.6s cubic-bezier(.45, .05, .4, 1) forwards; }
 .gl-page .entrance.leaving .splash-name,
 .gl-page .entrance.leaving .splash-handle,
@@ -75,21 +83,28 @@
 .gl-page .motion-button[aria-pressed="true"] { color: #ffd0e6; }
 .gl-page .card-wrap { display: flex; justify-content: center; padding: 4px 12px 18px; }
 .gl-page .card {
-  position: relative; width: min(460px, 100%); padding: 0 16px 16px; border-radius: 28px; text-align: center;
-  border: 1px solid color-mix(in srgb, var(--accent) 42%, transparent);
-  background: linear-gradient(180deg, color-mix(in srgb, var(--card) 88%, white), var(--card));
-  box-shadow: 0 30px 70px -36px #000, 0 0 80px -34px color-mix(in srgb, var(--accent) 70%, transparent);
+  position: relative; width: min(460px, 100%); padding: 0 16px 16px; border-radius: 28px; text-align: center; overflow: hidden;
+  border: 1px solid rgba(143, 108, 255, .35);
+  background: rgba(18, 14, 34, .55);
+  box-shadow: 0 30px 70px -36px #000, 0 0 48px rgba(143, 108, 255, .28);
+  backdrop-filter: blur(18px) saturate(140%);
+}
+.gl-page .card::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(115deg, transparent 32%, rgba(255,255,255,.16) 48%, transparent 64%);
+  transform: translateX(-130%);
+  animation: card-sheen 7s ease-in-out infinite;
 }
 .gl-page .card-edge { position: absolute; inset: 0; border-radius: inherit; padding: 1px; pointer-events: none;
   background: linear-gradient(160deg, color-mix(in srgb, var(--accent) 80%, white), transparent 40%, color-mix(in srgb, var(--accent) 40%, white));
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); mask-composite: exclude;
 }
 .gl-page .banner { position: relative; height: 132px; margin: 0 -16px 0; border-radius: 28px 28px 0 0; overflow: hidden;
-  background: radial-gradient(circle at 78% 30%, color-mix(in srgb, var(--accent) 80%, white), transparent 36%), linear-gradient(160deg, color-mix(in srgb, var(--accent) 28%, #120e22), #09070f);
+  background: linear-gradient(160deg, rgba(143, 108, 255, .72), rgba(54, 200, 255, .28) 46%, rgba(18, 14, 34, .15));
 }
 .gl-page .banner-ghost { position: absolute; right: 8%; top: 16%; width: 64px; height: 64px; color: #fff; opacity: .55; animation: ghost-bob 6s ease-in-out infinite; pointer-events: none; }
 .gl-page .banner-ghost .ico { width: 100%; height: 100%; }
-.gl-page .banner-fade { position: absolute; inset: auto 0 0; height: 48%; background: linear-gradient(transparent, rgba(8, 6, 16, .95)); }
+.gl-page .banner-fade { position: absolute; inset: auto 0 0; height: 58%; background: linear-gradient(transparent, rgba(18, 14, 34, .55)); }
 .gl-page .avatar-wrap { position: relative; width: 112px; height: 112px; margin: -52px auto 10px; }
 .gl-page .avatar-ring { position: absolute; inset: -4px; border-radius: 50%; background: conic-gradient(var(--accent), #fff, var(--accent)); animation: spin 8s linear infinite; }
 .gl-page .avatar, .gl-page .avatar-fallback { position: absolute; inset: 0; width: 112px; height: 112px; border-radius: 50%; object-fit: cover; border: 4px solid #120e20; background: #161222; display: grid; place-items: center; }
@@ -116,7 +131,7 @@
 .gl-page .cover { width: 100%; height: 100%; object-fit: cover; }
 .gl-page .track-copy { min-width: 0; flex: 1; }
 .gl-page .now { margin: 0; color: #ff8ea3; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
-.gl-page .track-title { margin: 2px 0; font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; }
+.gl-page .track-title { margin: 2px 0; font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; mask-image: linear-gradient(90deg, #000 72%, transparent); -webkit-mask-image: linear-gradient(90deg, #000 72%, transparent); }
 .gl-page .track-by { margin: 0; color: var(--muted); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .gl-page .track-count { color: var(--soft); font-size: 12px; }
 .gl-page .progress, .gl-page .player-bottom { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
@@ -175,4 +190,6 @@
 @keyframes rain-fall { from { transform: translateY(-10vh); } to { transform: translateY(110vh); } }
 @keyframes grid-drift { from { background-position: 0 0; } to { background-position: 0 48px; } }
 @keyframes spin { to { transform: rotate(360deg); } }
+@keyframes pill-ring { 0% { box-shadow: 0 0 0 0 rgba(143, 108, 255, .65); } 100% { box-shadow: 0 0 0 16px rgba(143, 108, 255, 0); } }
+@keyframes card-sheen { 0%, 55% { transform: translateX(-130%); } 80%, 100% { transform: translateX(130%); } }
 @keyframes eq { 0%, 100% { transform: scaleY(.3); } 50% { transform: scaleY(1); } }

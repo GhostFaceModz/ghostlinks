@@ -103,9 +103,11 @@ export function bindPlayer(root, initialTracks) {
     byline.textContent = data.author || track?.artist || "YouTube";
     count.textContent = tracks.length ? `${index + 1} / ${tracks.length}` : "";
     if (id) {
-      cover.src = `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
-      cover.alt = "";
       open.href = `https://www.youtube.com/watch?v=${id}`;
+      if (showArt) {
+        cover.src = `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
+        cover.alt = "";
+      }
     }
   }
 
@@ -161,6 +163,7 @@ export function bindPlayer(root, initialTracks) {
   }
 
   let armed = false;
+  let showArt = false;
   function play() {
     wantPlay = true;
     if (!tracks.length) return;
@@ -292,10 +295,16 @@ export function bindPlayer(root, initialTracks) {
     play,
     activate() {
       armed = true;
+      showArt = true;
+      showMeta();
       wantPlay = true;
       if (!tracks.length) return;
       ensure();
       if (ready) play();
+    },
+    revealArt() {
+      showArt = true;
+      showMeta();
     },
     pause() { pause(); },
     setTracks(next) {

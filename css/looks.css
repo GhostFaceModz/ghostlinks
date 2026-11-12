@@ -2,7 +2,7 @@
 
 .gl-page .splash-stage { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
 .gl-page .splash-stage.has-image { background-size: cover; background-position: center; opacity: .9; }
-.gl-page .fx-host { position: absolute; inset: 0; z-index: 3; pointer-events: none; overflow: hidden; }
+.gl-page .fx-host { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
 .gl-page.is-live .fx-host { position: fixed; }
 .gl-page .fx-particles, .gl-page .fx-rain, .gl-page .fx-smoke, .gl-page .fx-aurora, .gl-page .fx-ghosts { position: absolute; inset: 0; }
 .gl-page .fx-rain, .gl-page .fx-smoke, .gl-page .fx-aurora, .gl-page .fx-ghosts { display: none; }
@@ -66,7 +66,9 @@
 .gl-page.fx-ghosts .fx-ghosts { display: block; }
 .gl-page.fx-ghosts .fx-ghosts::before,
 .gl-page.fx-ghosts .fx-ghosts::after {
-  content: "👻"; position: absolute; font-size: 22px; opacity: .55; animation: look-float-in 7s ease-in-out infinite;
+  content: ""; position: absolute; width: 48px; height: 48px; opacity: .3;
+  background: center / contain no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23f4f0ff' d='M12 3c-3.7 0-6.5 2.7-6.5 6.6V20l2.2-1.6L10 20.2 12.2 18l2.3 2.2L16.8 18.4 19 20v-10.4C19 5.7 16.2 3 12 3zm-2.4 7.2a1.1 1.1 0 1 1 0 2.2 1.1 1.1 0 0 1 0-2.2zm4.8 0a1.1 1.1 0 1 1 0 2.2 1.1 1.1 0 0 1 0-2.2zM9.2 14.2c.7 1.3 1.7 1.9 2.8 1.9s2.1-.6 2.8-1.9'/%3E%3C/svg%3E");
+  animation: look-float-in 7s ease-in-out infinite;
 }
 .gl-page.fx-ghosts .fx-ghosts::before { left: 12%; top: 30%; }
 .gl-page.fx-ghosts .fx-ghosts::after { right: 18%; top: 55%; animation-delay: -3s; font-size: 16px; }
@@ -171,7 +173,7 @@
 .fxmini-stars s:nth-child(5) { left: 76%; top: 48%; }
 .fxmini-fireflies s { width: 5px; height: 5px; border-radius: 50%; background: #e6ff8a; box-shadow: 0 0 8px #e6ff8a; animation: look-float-in 2.2s ease-in-out infinite alternate; }
 .fxmini-fireflies s:nth-child(4) { left: 62%; top: 40%; }
-.fxmini-ghosts::before { content: "👻"; position: absolute; font-size: 16px; animation: look-float-in 2.4s ease-in-out infinite; }
+.fxmini-ghosts::before { content: ""; width: 22px; height: 22px; opacity: .3; background: center / contain no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23f4f0ff' d='M12 3c-3.7 0-6.5 2.7-6.5 6.6V20l2.2-1.6L10 20.2 12.2 18l2.3 2.2L16.8 18.4 19 20v-10.4C19 5.7 16.2 3 12 3z'/%3E%3C/svg%3E"); animation: look-float-in 2.4s ease-in-out infinite; }
 .fxmini-sakura s { width: 7px; height: 5px; border-radius: 60% 0; background: #ffb7d5; animation: look-rain 2s linear infinite; }
 .fxmini-sakura s:nth-child(4) { left: 40%; }
 .fxmini-sakura s:nth-child(5) { left: 70%; animation-delay: -.6s; }

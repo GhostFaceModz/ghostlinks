@@ -13,6 +13,7 @@ import {
 } from "./model.js";
 import { MAX_EFFECTS, normalizeSettings } from "./looks.js";
 import { mountEffectCards, mountSplashCards, toggleEffect } from "./market.js";
+import { mountLogoPicker } from "./logo-picker.js";
 import { mountSplashGallery } from "./splash-gallery.js";
 import { mountPage } from "./page.js";
 import { bindRadioGroup } from "./radios.js";
@@ -231,6 +232,12 @@ function renderEditor(app, profile, persistedUsername, session, demo) {
     pageApi?.replay();
   });
 
+  const logoPicker = el("div", { class: "logo-picker" });
+  mountLogoPicker(logoPicker, profile, (value) => {
+    profile.settings.logo_image = value;
+    refresh();
+  }, (message) => { status.textContent = message; });
+
   const gallery = el("div", { class: "splash-gallery" });
   mountSplashGallery(gallery, profile, (value) => {
     profile.settings.splash_image = value;
@@ -389,6 +396,9 @@ function renderEditor(app, profile, persistedUsername, session, demo) {
       bgRow,
       el("p", { class: "ed-label" }, "Click-to-enter style"),
       splashRow,
+      el("p", { class: "ed-label" }, "Ghost mark"),
+      el("p", { class: "ed-hint" }, "A transparent ghost from the set, or your own image. It floats on the entrance and the card, with no box around it."),
+      logoPicker,
       el("p", { class: "ed-label" }, "Entrance image"),
       el("p", { class: "ed-hint" }, "A preset from the gallery, or your own image. Missing files stay as quiet placeholders."),
       gallery,

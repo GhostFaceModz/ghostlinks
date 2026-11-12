@@ -41,8 +41,9 @@ export const MAX_EFFECTS = 10;
 const SPLASH_IDS = new Set(SPLASHES.map((item) => item.id));
 const EFFECT_IDS = new Set(EFFECTS.map((item) => item.id));
 
-const SPLASH_FILE = /^splash-(0[1-9]|1[0-9]|20)\.webp$/;
-const PRESET_IMAGE = /^assets\/splash\/splash-(0[1-9]|1[0-9]|20)\.webp$/;
+const SPLASH_FILE = /^splash-(0[1-9]|[12][0-9]|3[0-2])\.webp$/;
+const PRESET_IMAGE = /^assets\/splash\/splash-(0[1-9]|[12][0-9]|3[0-2])\.webp$/;
+const LOGO_PRESET = /^assets\/brand\/ghosts\/ghost-[a-z0-9_-]{1,40}\.png$/;
 const DATA_IMAGE = /^data:image\/(png|jpeg|webp|gif);base64,[a-z0-9+/=]+$/i;
 
 /** Base64 of a data URL must stay within 180000 characters. 130KB raw is under that cap. */
@@ -70,6 +71,14 @@ export function splashPreviewPath(item = {}) {
   return `assets/splash/thumbs/${file}`;
 }
 
+export function normalizeLogoImage(value) {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+  if (LOGO_PRESET.test(raw)) return raw;
+  if (DATA_IMAGE.test(raw) && raw.length <= DATA_IMAGE_MAX) return raw;
+  return "";
+}
+
 export function normalizeSplashImage(value) {
   const raw = String(value || "").trim();
   if (!raw) return "";
@@ -87,5 +96,10 @@ export function normalizeSettings(input = {}) {
     effects.push(id);
     if (effects.length >= MAX_EFFECTS) break;
   }
-  return { splash, effects, splash_image: normalizeSplashImage(input.splash_image) };
+  return {
+    splash,
+    effects,
+    splash_image: normalizeSplashImage(input.splash_image),
+    logo_image: normalizeLogoImage(input.logo_image)
+  };
 }

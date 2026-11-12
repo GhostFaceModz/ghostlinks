@@ -1,6 +1,6 @@
 /** Profile shape, validation, and the built-in demo page. Pure: no DOM. */
 
-import { normalizeSettings } from "./looks.js";
+import { normalizeLogoImage, normalizeSettings } from "./looks.js";
 
 export const RESERVED_USERNAMES = [
   "admin",
@@ -234,6 +234,9 @@ export function profileIssues(raw = {}) {
   else if (displayName.length > LIMITS.name) issues.push({ field: "displayName", message: "Display name must be 40 characters or fewer." });
   if (String(raw.bio || "").trim().length > LIMITS.bio) issues.push({ field: "bio", message: "Bio must be 280 characters or fewer." });
   if (raw.avatarUrl && !safeAvatar(raw.avatarUrl)) issues.push({ field: "avatar", message: "Avatar must be an https link or a small PNG, JPEG, WebP, or GIF." });
+  if (raw.settings?.logo_image && !normalizeLogoImage(raw.settings.logo_image)) {
+    issues.push({ field: "logo", message: "That logo is too large to save. Keep GIFs under 130 KB." });
+  }
   const links = Array.isArray(raw.links) ? raw.links : [];
   if (links.length > LIMITS.links) issues.push({ field: "links", message: "You can add up to 10 links." });
   links.forEach((link, index) => {

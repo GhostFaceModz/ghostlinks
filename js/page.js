@@ -5,7 +5,7 @@ import { EFFECTS } from "./looks.js";
 import { mountBackground } from "./effects.js";
 import { mountOverlays } from "./overlays.js";
 import { bindPlayer } from "./player.js";
-import { homeHref } from "./route.js";
+import { homeHref, siteBase } from "./route.js";
 
 const NS = "http://www.w3.org/2000/svg";
 
@@ -63,8 +63,13 @@ function splashGhostNode() {
   smile.setAttribute("stroke-width", "5");
   smile.setAttribute("stroke-linecap", "round");
   svg.append(body, left, right, smile);
-  wrap.append(svg);
+  wrap.append(svg, el("img", { class: "logo-img", alt: "", hidden: true }));
   return wrap;
+}
+
+function logoUrl(value) {
+  if (!value) return "";
+  return value.startsWith("data:") ? value : `${siteBase()}${value}`;
 }
 
 function applyLook(page, profile) {
@@ -134,6 +139,7 @@ export function mountPage(container, rawProfile, options = {}) {
   const avatarImg = el("img", { class: "avatar", alt: "", width: "128", height: "128" });
   const avatarFallback = el("span", { class: "avatar-fallback", "aria-hidden": "true" }, [svgIcon("ghost")]);
   const avatarWrap = el("div", { class: "avatar-wrap" }, [el("span", { class: "avatar-ring", "aria-hidden": "true" }), avatarImg, avatarFallback]);
+  const cardLogo = el("img", { class: "card-logo", alt: "", hidden: true });
   const name = el("h1", { class: "profile-name" });
   const handle = el("p", { class: "handle" });
   const bio = el("p", { class: "bio" });
@@ -145,6 +151,7 @@ export function mountPage(container, rawProfile, options = {}) {
   const card = el("article", { class: "card" }, [
     el("div", { class: "card-edge", "aria-hidden": "true" }),
     banner,
+    cardLogo,
     avatarWrap,
     name,
     handle,
@@ -183,6 +190,20 @@ export function mountPage(container, rawProfile, options = {}) {
       if (!playerApi && profile.tracks.length) playerApi = bindPlayer(music, profile.tracks);
       else playerApi?.setTracks(profile.tracks);
     }
+    const mark = logoUrl(profile.settings?.logo_image || "");
+    const logoImg = ghost.querySelector(".logo-img");
+    ghost.classList.toggle("has-logo", Boolean(mark));
+    entrance.classList.toggle("has-photo", Boolean(profile.settings?.splash_image));
+    if (logoImg) {
+      if (mark) logoImg.src = mark;
+      else logoImg.removeAttribute("src");
+      logoImg.hidden = !mark;
+    }
+    cardLogo.hidden = !mark;
+    if (mark) {
+      cardLogo.src = mark;
+      cardLogo.alt = "";
+    } else cardLogo.removeAttribute("src");
     if (profile.avatarUrl) {
       avatarImg.src = profile.avatarUrl;
       avatarImg.alt = `${shown}'s avatar`;
@@ -360,6 +381,7 @@ export function mountPage(container, rawProfile, options = {}) {
     entrance.classList.add("dismissed");
     retireGhost();
     setInert(experience, false);
+    playerApi?.revealArt();
   }
 
   document.addEventListener("visibilitychange", onHide);

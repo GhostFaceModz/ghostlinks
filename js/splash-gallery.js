@@ -1,7 +1,7 @@
 /** Entrance image: a preset from assets/splash/manifest.json, or a compressed upload. */
 
 import { el } from "./dom.js";
-import { DATA_IMAGE_MAX, GIF_RAW_MAX, normalizeSplashImage, splashFullPath, splashPreviewPath } from "./looks.js";
+import { DATA_IMAGE_MAX, GIF_RAW_MAX, normalizeSplashImage, splashPreviewPath } from "./looks.js";
 import { bindRadioGroup } from "./radios.js";
 import { siteBase } from "./route.js";
 
@@ -14,7 +14,7 @@ export async function loadSplashManifest() {
     if (!response.ok) return [];
     const data = await response.json();
     const images = Array.isArray(data) ? data : (Array.isArray(data.images) ? data.images : []);
-    return images.filter((item) => item && /^splash-(0[1-9]|1[0-9]|20)\.webp$/.test(item.file));
+    return images.filter((item) => item && /^splash-(0[1-9]|[12][0-9]|3[0-2])\.webp$/.test(item.file));
   } catch {
     return [];
   }
@@ -91,8 +91,7 @@ export async function mountSplashGallery(container, profile, onChange, onError) 
   }
   for (const item of images) {
     const path = presetPath(item.file);
-    const full = splashFullPath(item);
-    const preview = splashPreviewPath(item);
+    const preview = item.thumb ? splashPreviewPath(item) : "";
     if (!path || !preview) continue;
     const button = presetButton(item.name || item.label || item.file, path, profile.settings.splash_image === path);
     if (Array.isArray(item.tags) && item.tags.length) button.title = item.tags.slice(0, 4).join(" · ");
@@ -105,14 +104,7 @@ export async function mountSplashGallery(container, profile, onChange, onError) 
       height: "180"
     });
     const fallback = el("span", { class: "preset-fallback", "aria-hidden": "true" });
-    img.addEventListener("error", () => {
-      if (full && img.dataset.full !== "1" && preview !== full) {
-        img.dataset.full = "1";
-        img.src = `${siteBase()}${full}`;
-        return;
-      }
-      img.hidden = true;
-    });
+    img.addEventListener("error", () => { img.hidden = true; });
     button.prepend(fallback, img);
     button.addEventListener("click", () => choose(path));
     grid.append(button);
