@@ -1,0 +1,62 @@
+[
+  {
+    "id": "hooded-neon-ghost",
+    "label": "Hooded Neon Ghost",
+    "file": "avatar-hooded-neon-ghost.webp"
+  },
+  {
+    "id": "cyber-mask",
+    "label": "Cyber Mask",
+    "file": "avatar-cyber-mask.webp"
+  },
+  {
+    "id": "chrome-ghost",
+    "label": "Chrome Ghost",
+    "file": "avatar-chrome-ghost.webp"
+  },
+  {
+    "id": "anime-ghost-girl",
+    "label": "Anime Ghost Girl",
+    "file": "avatar-anime-ghost-girl.webp"
+  },
+  {
+    "id": "golden-ghost-king",
+    "label": "Golden Ghost King",
+    "file": "avatar-golden-ghost-king.webp"
+  },
+  {
+    "id": "glitch-skull",
+    "label": "Glitch Skull",
+    "file": "avatar-glitch-skull.webp"
+  },
+  {
+    "id": "cosmic-astronaut-ghost",
+    "label": "Cosmic Astronaut Ghost",
+    "file": "avatar-cosmic-astronaut-ghost.webp"
+  },
+  {
+    "id": "samurai-ghost",
+    "label": "Samurai Ghost",
+    "file": "avatar-samurai-ghost.webp"
+  },
+  {
+    "id": "cat-ghost",
+    "label": "Cat Ghost",
+    "file": "avatar-cat-ghost.webp"
+  },
+  {
+    "id": "dj-ghost",
+    "label": "DJ Ghost",
+    "file": "avatar-dj-ghost.webp"
+  },
+  {
+    "id": "smoke-wraith",
+    "label": "Smoke Wraith",
+    "file": "avatar-smoke-wraith.webp"
+  },
+  {
+    "id": "holographic-ghost",
+    "label": "Holographic Ghost",
+    "file": "avatar-holographic-ghost.webp"
+  }
+]
