@@ -13,7 +13,7 @@ import {
   safeHttps,
   validateUsername
 } from "../js/model.js";
-import { prettyPathRedirect } from "../js/route.js";
+import { editorRedirectUrl, prettyPathRedirect } from "../js/route.js";
 
 test("usernames accept the documented shape and reject reserved names", () => {
   assert.equal(validateUsername("Ghost").username, "ghost");
@@ -26,13 +26,38 @@ test("usernames accept the documented shape and reject reserved names", () => {
 });
 
 test("the SQL migration reserves every name the editor knows", () => {
-  const sql = fs.readFileSync(new URL("../supabase/migrations/20261112033000_create_profiles.sql", import.meta.url), "utf8");
+  const sql = fs.readFileSync(new URL("../supabase/migrations/20261112050000_ghostlinks_profiles.sql", import.meta.url), "utf8");
   for (const name of RESERVED_USERNAMES) {
     assert.match(sql, new RegExp(`'${name}'`));
   }
+  assert.match(sql, /ghostlinks_profiles/);
+  assert.match(sql, /ghostlinks_reserved_usernames/);
+  assert.match(sql, /ghostlinks_username_available/);
   assert.match(sql, /enable row level security/);
   assert.match(sql, /force row level security/);
   assert.doesNotMatch(sql, /service_role/);
+  assert.doesNotMatch(sql, /create table public\.profiles\b/i);
+  assert.doesNotMatch(sql, /alter table public\.profiles\b/i);
+  assert.doesNotMatch(sql, /drop table/i);
+});
+
+test("Discord redirect follows the project-site base path", () => {
+  assert.equal(
+    editorRedirectUrl("https://ghostfacemodz.github.io", "/ghostlinks/", "ghostfacemodz.github.io"),
+    "https://ghostfacemodz.github.io/ghostlinks/editor.html"
+  );
+  assert.equal(
+    editorRedirectUrl("https://ghostfacemodz.github.io", "/ghostlinks/index.html", "ghostfacemodz.github.io"),
+    "https://ghostfacemodz.github.io/ghostlinks/editor.html"
+  );
+  assert.equal(
+    editorRedirectUrl("https://ghostapps.org", "/editor.html", "ghostapps.org"),
+    "https://ghostapps.org/editor.html"
+  );
+  assert.equal(
+    editorRedirectUrl("http://127.0.0.1:8080", "/", "127.0.0.1"),
+    "http://127.0.0.1:8080/editor.html"
+  );
 });
 
 test("youtube and link parsing stay strict", () => {

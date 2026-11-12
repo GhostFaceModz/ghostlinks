@@ -45,3 +45,17 @@ export function publicHref(username) {
   const name = String(username || "").trim().toLowerCase();
   return `${siteBase()}?u=${encodeURIComponent(name)}`;
 }
+
+/** Project sites on *.github.io live under /repo/. A custom domain is at the root. */
+export function appBasePath(pathname, hostname) {
+  if (/\.github\.io$/i.test(hostname || "")) {
+    const first = String(pathname || "/").split("/").filter(Boolean)[0];
+    return first ? `/${first}/` : "/";
+  }
+  return "/";
+}
+
+export function editorRedirectUrl(origin, pathname, hostname) {
+  const base = appBasePath(pathname, hostname);
+  return new URL(`${base}editor.html`, origin).href;
+}

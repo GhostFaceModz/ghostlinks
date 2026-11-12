@@ -24,31 +24,25 @@ Open [http://127.0.0.1:8080](http://127.0.0.1:8080).
 
 `python3 -m http.server 8080` also serves the site. Use `/?u=username` there. Python does not serve `404.html` for unknown paths; GitHub Pages does.
 
-## Publish with Supabase and GitHub Pages
+## Supabase and Discord
 
-Both have free plans. The anon key is public by design. Never put the service-role key, secret key, or database password in `config.js` or anywhere else in this repo. If a service-role key is pasted in, the editor refuses to start.
+GhostLinks shares the existing GhostApps Supabase project. It does not create a new project, and it does not touch the shared `profiles` table. `config.js` already has the project URL and the publishable key. That key is public by design. Never put a service-role key in this repo.
 
-1. Create a Supabase project.
-2. In the SQL editor, run `supabase/migrations/20261112033000_create_profiles.sql`.
-3. Authentication → URL configuration:
-   - Site URL: `https://ghostapps.org` (or your Pages URL while testing).
-   - Add redirect URLs: `https://ghostapps.org/editor.html`, `http://127.0.0.1:8080/editor.html`, and the GitHub Pages editor URL if you use one.
-4. Authentication → Providers → Discord. Create a Discord application, and set its OAuth2 redirect to the Supabase callback shown in that panel (`https://<project-ref>.supabase.co/auth/v1/callback`). Enable the provider with the Discord client id and secret. Those secrets stay in the Supabase dashboard.
-5. Copy the project URL and the **anon** (or publishable) key into `config.js`:
+Clear both `config.js` values to fall back to demo mode. `?u=demo` stays available either way.
 
-```js
-window.GHOSTLINKS_CONFIG = {
-  supabaseUrl: "https://YOUR_PROJECT.supabase.co",
-  supabaseAnonKey: "YOUR_ANON_KEY"
-};
-```
+1. In the SQL editor, run `supabase/migrations/20261112050000_ghostlinks_profiles.sql`. It only creates `ghostlinks_` tables, functions, policies, and a trigger. Re-running it is safe.
+2. Authentication → URL configuration. Leave the existing Site URL alone if GhostGames or GhostFlix already use it. Add these redirect URLs:
+   - `https://ghostfacemodz.github.io/ghostlinks/editor.html`
+   - `https://ghostfacemodz.github.io/ghostlinks/`
+   - `http://127.0.0.1:8080/editor.html`
+   - `http://localhost:8080/editor.html`
+3. Discord’s OAuth callback stays the Supabase one (`https://rswtambjckwmlagydsvf.supabase.co/auth/v1/callback`). The provider itself is configured in the Supabase dashboard, not in this repo.
 
-6. GitHub → Settings → Pages → Deploy from a branch → root of the branch. `.nojekyll` is already in the repo so asset folders are published as-is.
-7. For `ghostapps.org/<username>`, point the domain at this Pages site when you are ready. `404.html` sends `/username` to `/?u=username`. On a `*.github.io` project site (`/ghostlinks/username`) the first path segment is kept.
+Sign-in returns to `editor.html` under the current site root: `/ghostlinks/editor.html` on the GitHub project site, or `/editor.html` on a custom domain. Each Discord user gets one row in `ghostlinks_profiles`. They can edit only that row. Anyone can read a published page.
 
-Sign-in returns to `editor.html`. Each Discord user gets one row in `profiles`. They can insert and update only that row. Anyone can read a published page. Unpublished pages are visible to the owner only. Usernames are unique and lowercase.
+The site is published from `GhsotFace` at `https://ghostfacemodz.github.io/ghostlinks/`. `404.html` sends `/ghostlinks/<username>` to `/?u=<username>`.
 
-Reserved names include `admin`, `api`, `ghostflix`, `ghostgames`, `ghostfacezen`, and `www`, plus routes the site needs (`editor`, `demo`, `assets`, and the rest of the list in the migration).
+Reserved names include `admin`, `api`, `ghostflix`, `ghostgames`, `ghostfacezen`, and `www`, plus routes the site needs (`editor`, `demo`, `assets`, and the rest of the list in the migration). They are stored in `ghostlinks_reserved_usernames`.
 
 Open Graph tags on the shell are a fallback. Per-person images need a server later; crawlers do not run the page script. The visible page title and description do update in the browser.
 
