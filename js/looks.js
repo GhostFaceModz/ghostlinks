@@ -1,40 +1,40 @@
 /** Splash styles and combinable page effects. Ids are what we store. */
 
 export const SPLASHES = [
-  { id: "ghost", label: "Ghost float", hint: "The classic bob, then it flies away" },
-  { id: "glitch", label: "Glitch", hint: "Sliced, jittering type" },
-  { id: "neon", label: "Neon flicker", hint: "A sign that will not stay lit" },
-  { id: "smoke", label: "Smoke", hint: "The name clears out of fog" },
-  { id: "burst", label: "Particle burst", hint: "Sparks around the ghost" },
-  { id: "typewriter", label: "Typewriter", hint: "The name types itself" },
-  { id: "vhs", label: "VHS", hint: "Scanlines and a soft wobble" },
-  { id: "matrix", label: "Matrix", hint: "Green rain behind the title" },
-  { id: "dissolve", label: "Dissolve", hint: "The ghost melts into blur" },
-  { id: "portal", label: "Portal", hint: "Ripples opening in the dark" },
-  { id: "floatin", label: "Float in", hint: "The ghost rises into place" },
-  { id: "shatter", label: "Shattered glass", hint: "The title breaks apart" },
-  { id: "fade", label: "Minimal fade", hint: "Almost nothing, then the page" }
+  { id: "ghost", label: "Ghost float", tag: "Signature", hint: "The classic bob, then it flies away" },
+  { id: "glitch", label: "Glitch", tag: "Type", hint: "Sliced, jittering type" },
+  { id: "neon", label: "Neon flicker", tag: "Light", hint: "A sign that will not stay lit" },
+  { id: "smoke", label: "Smoke", tag: "Atmosphere", hint: "The name clears out of fog" },
+  { id: "burst", label: "Particle burst", tag: "Motion", hint: "Sparks around the ghost" },
+  { id: "typewriter", label: "Typewriter", tag: "Type", hint: "The name types itself" },
+  { id: "vhs", label: "VHS", tag: "Retro", hint: "Scanlines and a soft wobble" },
+  { id: "matrix", label: "Matrix", tag: "Retro", hint: "Green rain behind the title" },
+  { id: "dissolve", label: "Dissolve", tag: "Motion", hint: "The ghost melts into blur" },
+  { id: "portal", label: "Portal", tag: "Atmosphere", hint: "Ripples opening in the dark" },
+  { id: "floatin", label: "Float in", tag: "Signature", hint: "The ghost rises into place" },
+  { id: "shatter", label: "Shattered glass", tag: "Type", hint: "The title breaks apart" },
+  { id: "fade", label: "Minimal fade", tag: "Minimal", hint: "Almost nothing, then the page" }
 ];
 
 export const EFFECTS = [
-  { id: "snow", label: "Snow" },
-  { id: "rain", label: "Rain" },
-  { id: "stars", label: "Stars" },
-  { id: "fireflies", label: "Fireflies" },
-  { id: "ghosts", label: "Floating ghosts" },
-  { id: "sakura", label: "Sakura" },
-  { id: "bubbles", label: "Bubbles" },
-  { id: "smoke", label: "Smoke" },
-  { id: "aurora", label: "Aurora wash" },
-  { id: "trail", label: "Cursor trail" },
-  { id: "sparkle", label: "Sparkle cursor" },
-  { id: "tilt", label: "Tilt card" },
-  { id: "glow", label: "Glow border" },
-  { id: "typewriter", label: "Typewriter bio" },
-  { id: "rainbow", label: "Gradient name" },
-  { id: "glitch", label: "Glitch name" },
-  { id: "parallax", label: "Parallax" },
-  { id: "visualiser", label: "Visualizer bars" }
+  { id: "snow", label: "Snow", tag: "Weather" },
+  { id: "rain", label: "Rain", tag: "Weather" },
+  { id: "stars", label: "Stars", tag: "Sky" },
+  { id: "fireflies", label: "Fireflies", tag: "Sky" },
+  { id: "ghosts", label: "Floating ghosts", tag: "Signature" },
+  { id: "sakura", label: "Sakura", tag: "Weather" },
+  { id: "bubbles", label: "Bubbles", tag: "Motion" },
+  { id: "smoke", label: "Smoke", tag: "Atmosphere" },
+  { id: "aurora", label: "Aurora wash", tag: "Atmosphere" },
+  { id: "trail", label: "Cursor trail", tag: "Pointer" },
+  { id: "sparkle", label: "Sparkle cursor", tag: "Pointer" },
+  { id: "tilt", label: "Tilt card", tag: "Card" },
+  { id: "glow", label: "Glow border", tag: "Card" },
+  { id: "typewriter", label: "Typewriter bio", tag: "Type" },
+  { id: "rainbow", label: "Gradient name", tag: "Type" },
+  { id: "glitch", label: "Glitch name", tag: "Type" },
+  { id: "parallax", label: "Parallax", tag: "Motion" },
+  { id: "visualiser", label: "Visualizer bars", tag: "Audio" }
 ];
 
 export const MAX_EFFECTS = 10;

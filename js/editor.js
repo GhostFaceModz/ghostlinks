@@ -11,7 +11,8 @@ import {
   platformLabel,
   safeAvatar
 } from "./model.js";
-import { EFFECTS, MAX_EFFECTS, SPLASHES, normalizeSettings } from "./looks.js";
+import { MAX_EFFECTS, normalizeSettings } from "./looks.js";
+import { mountEffectCards, mountSplashCards, toggleEffect } from "./market.js";
 import { mountPage } from "./page.js";
 import { editorHref, homeHref, publicHref } from "./route.js";
 import {
@@ -226,44 +227,21 @@ function renderEditor(app, profile, persistedUsername, session, demo) {
     bgRow.append(button);
   }
 
-  const splashRow = el("div", { class: "splash-grid", role: "radiogroup", "aria-label": "Click-to-enter style" });
-  for (const splash of SPLASHES) {
-    const button = el("button", {
-      type: "button",
-      class: "splash-pick",
-      "aria-pressed": String(profile.settings.splash === splash.id),
-      title: splash.hint
-    }, [
-      el("span", { class: `splash-mini mini-${splash.id}`, "aria-hidden": "true" }, [el("i", {}, "Aa"), el("b")]),
-      el("span", {}, splash.label)
-    ]);
-    button.addEventListener("click", () => {
-      profile.settings.splash = splash.id;
-      splashRow.querySelectorAll(".splash-pick").forEach((node) => node.setAttribute("aria-pressed", "false"));
-      button.setAttribute("aria-pressed", "true");
-      refresh();
-      pageApi?.replay();
-    });
-    splashRow.append(button);
-  }
+  const splashRow = el("div", { role: "radiogroup", "aria-label": "Click-to-enter style" });
+  mountSplashCards(splashRow, profile, (id) => {
+    profile.settings.splash = id;
+    refresh();
+    pageApi?.replay();
+  });
 
-  const effectRow = el("div", { class: "choice-row", role: "group", "aria-label": "Page effects" });
-  for (const effect of EFFECTS) {
-    const on = profile.settings.effects.includes(effect.id);
-    const button = el("button", { type: "button", class: "choice", "aria-pressed": String(on) }, effect.label);
-    button.addEventListener("click", () => {
-      const list = profile.settings.effects;
-      const index = list.indexOf(effect.id);
-      if (index >= 0) list.splice(index, 1);
-      else if (list.length >= MAX_EFFECTS) {
-        status.textContent = `Up to ${MAX_EFFECTS} effects at once. Turn one off first.`;
-        return;
-      } else list.push(effect.id);
-      button.setAttribute("aria-pressed", String(list.includes(effect.id)));
-      refresh();
+  const effectRow = el("div", { role: "group", "aria-label": "Page effects" });
+  mountEffectCards(effectRow, profile, (id) => {
+    const result = toggleEffect(profile, id, () => {
+      status.textContent = `Up to ${MAX_EFFECTS} effects at once. Turn one off first.`;
     });
-    effectRow.append(button);
-  }
+    if (result != null) refresh();
+    return result;
+  });
 
   const fontRow = el("div", { class: "choice-row", role: "radiogroup", "aria-label": "Font" });
   for (const [id, font] of Object.entries(FONTS)) {
