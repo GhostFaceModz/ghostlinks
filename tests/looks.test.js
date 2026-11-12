@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import test from "node:test";
-import { BACKDROPS, EFFECTS, GIF_RAW_MAX, MAX_EFFECTS, SPLASHES, TEMPLATES, activeBackdrop, normalizeAvatarFrame, normalizeLogoImage, normalizeSettings, normalizeSplashImage, splashFullPath, splashPreviewPath } from "../js/looks.js";
+import { BACKDROPS, EFFECTS, GIF_RAW_MAX, GHOST_MARKS, MAX_EFFECTS, SPLASHES, TEMPLATES, activeBackdrop, defaultGhostId, normalizeAvatarChoice, normalizeAvatarFrame, normalizeLogoImage, normalizeSettings, normalizeSplashImage, resolveAvatar, splashFullPath, splashPreviewPath } from "../js/looks.js";
 import { demoProfile, profileBadges } from "../js/model.js";
 
 test("there are at least 12 splashes and 15 effects", () => {
@@ -88,6 +88,26 @@ test("animated backgrounds are known ids behind the card", () => {
   assert.match(sql, /avatar_frame/);
   assert.doesNotMatch(sql, /alter table public\.profiles/);
   assert.doesNotMatch(sql, /drop table/i);
+  const avatarSql = fs.readFileSync(new URL("../supabase/migrations/20261112130000_ghostlinks_avatar_guard.sql", import.meta.url), "utf8");
+  for (const key of ["splash", "effects", "splash_image", "logo_image", "avatar_frame", "background", "background_media", "avatar"]) {
+    assert.match(avatarSql, new RegExp(`'${key}'`));
+  }
+  for (const item of BACKDROPS) assert.match(avatarSql, new RegExp(`'${item.id}'`));
+  assert.doesNotMatch(avatarSql, /alter table public\.profiles/);
+  assert.equal(normalizeAvatarChoice("Cyber-Mask"), "cyber-mask");
+  assert.equal(normalizeAvatarChoice("../x"), "");
+  assert.equal(defaultGhostId("#36c8ff"), "cool");
+  assert.equal(defaultGhostId("#8f6cff"), "cute");
+  assert.equal(GHOST_MARKS.length, 6);
+  const manifest = JSON.parse(fs.readFileSync(new URL("../assets/brand/avatars/manifest.json", import.meta.url), "utf8"));
+  assert.equal(manifest.length, 12);
+  const premium = manifest.map((item) => ({ id: item.id, file: item.file }));
+  const picked = resolveAvatar({ accent: "#8f6cff", settings: { avatar: "cat-ghost" } }, premium);
+  assert.equal(picked.src, "assets/brand/avatars/avatar-cat-ghost.webp");
+  assert.equal(picked.photo, true);
+  const fallback = resolveAvatar({ accent: "#8f6cff", avatarUrl: "", settings: {} });
+  assert.equal(fallback.src, "assets/brand/ghosts/ghost-cute.png");
+  assert.equal(normalizeSettings({ avatar: "hooded-neon-ghost", background: "aurora" }).avatar, "hooded-neon-ghost");
 });
 
 test("templates, frames, and demo badges stay in range", () => {

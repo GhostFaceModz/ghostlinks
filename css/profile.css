@@ -38,7 +38,7 @@
   padding: 24px 16px; text-align: center;
 }
 .gl-page.is-live .entrance { position: fixed; }
-.gl-page .splash-brand { position: absolute; top: max(16px, env(safe-area-inset-top)); display: flex; gap: 8px; align-items: center; letter-spacing: .22em; font-family: var(--font-display); font-size: 12px; }
+.gl-page .splash-brand { position: relative; top: auto; z-index: 3; flex: none; display: flex; gap: 8px; align-items: center; justify-content: center; max-width: 100%; margin: 0 0 14px; letter-spacing: .22em; font-family: var(--font-display); font-size: 12px; }
 .gl-page .splash-stage { z-index: 0; }
 .gl-page .entrance::before {
   content: "";
@@ -52,7 +52,7 @@
 }
 .gl-page .enter-button, .gl-page .splash-brand, .gl-page .splash-note { position: relative; z-index: 2; }
 .gl-page .enter-button { display: flex; flex-direction: column; align-items: center; background: none; border: 0; color: #fff; padding: 0; }
-.gl-page .splash-ghost { position: relative; display: grid; place-items: center; width: min(68vw, 280px); aspect-ratio: 1; color: #f7f4ff; animation: ghost-bob 5s ease-in-out infinite; }
+.gl-page .splash-ghost { position: relative; width: 112px; height: 112px; margin: 0; color: #f7f4ff; }
 .gl-page .ghost-svg { width: 78%; height: 78%; filter: drop-shadow(0 0 22px #8f6cff); }
 .gl-page .logo-img { display: none; width: 78%; height: 78%; object-fit: contain; background: none; border: 0; mix-blend-mode: lighten; filter: drop-shadow(0 0 18px color-mix(in srgb, var(--accent) 75%, transparent)); }
 .gl-page .splash-ghost.has-logo .ghost-svg,
@@ -129,12 +129,43 @@
 .gl-page .banner-ghost { position: absolute; right: 8%; top: 16%; width: 64px; height: 64px; color: #fff; opacity: .55; animation: ghost-bob 6s ease-in-out infinite; pointer-events: none; }
 .gl-page .banner-ghost .ico { width: 100%; height: 100%; }
 .gl-page .banner-fade { position: absolute; inset: auto 0 0; height: 70%; background: linear-gradient(transparent, rgba(8, 6, 16, .94)); }
-.gl-page .avatar-wrap { position: relative; width: 112px; height: 112px; margin: -52px auto 10px; }
-.gl-page .avatar-ring { position: absolute; inset: -4px; border-radius: 50%; background: conic-gradient(var(--accent), #fff, var(--accent)); animation: spin 8s linear infinite; }
-.gl-page .avatar, .gl-page .avatar-fallback { position: absolute; inset: 0; width: 112px; height: 112px; border-radius: 50%; object-fit: cover; border: 4px solid #120e20; background: #161222; display: grid; place-items: center; }
-.gl-page .avatar[hidden], .gl-page .avatar-fallback[hidden] { display: none !important; }
-.gl-page .avatar-fallback .ico { width: 54px; height: 54px; }
-.gl-page .splash-name { font-family: var(--font-display); font-size: clamp(32px, 9vw, 60px); letter-spacing: -.03em; line-height: 1; margin-top: -6px; }
+.gl-page .avatar-wrap { width: 112px; height: 112px; margin: -48px auto 16px; }
+.avatar-stage { position: relative; display: grid; place-items: center; width: 112px; height: 112px; }
+.avatar-stage.is-tile { width: 72px; height: 72px; }
+.avatar-glow {
+  position: absolute; inset: -8px; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent, #8f6cff) 58%, transparent), transparent 68%);
+  opacity: .7; animation: avatar-breathe 3.6s ease-in-out infinite;
+}
+.avatar-ring {
+  position: absolute; inset: 0; border-radius: 50%;
+  background: conic-gradient(var(--accent, #8f6cff), #fff, var(--accent, #8f6cff), transparent 58%, var(--accent, #8f6cff));
+  animation: spin 8s linear infinite;
+}
+.avatar-glass {
+  position: absolute; inset: 4px; z-index: 1; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle at 50% 38%, rgba(255,255,255,.16), rgba(12, 8, 22, .62) 62%, rgba(6, 4, 14, .9));
+  box-shadow: inset 0 10px 16px rgba(0,0,0,.4), inset 0 -6px 12px rgba(255,255,255,.08);
+}
+.avatar-stage.is-photo .avatar-glass { background: transparent; box-shadow: inset 0 0 16px rgba(0,0,0,.45); z-index: 2; }
+.avatar-mark, .avatar-photo { position: relative; z-index: 1; border: 0; background: transparent; }
+.avatar-mark { width: 68%; height: 68%; object-fit: contain; animation: avatar-float 4.8s ease-in-out infinite; }
+.avatar-photo { width: calc(100% - 8px); height: calc(100% - 8px); object-fit: cover; border-radius: 50%; }
+.avatar-upload-mark { position: relative; z-index: 1; color: #fff; font-size: 22px; line-height: 1; }
+.avatar-upload-mark[hidden], .avatar-photo[hidden] { display: none !important; }
+.avatar-picker { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.avatar-choice {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  min-height: 44px; padding: 8px 4px; border-radius: 16px; cursor: pointer;
+  border: 1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.04); color: inherit;
+}
+.avatar-choice[aria-checked="true"] { border-color: var(--accent, #8f6cff); box-shadow: 0 0 0 1px var(--accent, #8f6cff); }
+.avatar-choice-label { font-size: 11px; line-height: 1.2; text-align: center; }
+@media (max-width: 700px) {
+  .gl-page .splash-ghost.avatar-stage,
+  .gl-page .avatar-wrap.avatar-stage { width: 104px; height: 104px; }
+}
+.gl-page .splash-name { font-family: var(--font-display); font-size: clamp(32px, 9vw, 60px); letter-spacing: -.03em; line-height: 1; margin-top: 18px; }
 .gl-page .profile-name { margin: 8px 0 0; font-family: var(--font-display); font-size: clamp(30px, 8vw, 40px); letter-spacing: -.03em; line-height: 1.1; overflow-wrap: anywhere; }
 .gl-page .handle { margin: 4px 0 0; }
 .gl-page .bio { margin: 12px 0 0; color: #f6f3ff; white-space: pre-wrap; overflow-wrap: anywhere; text-shadow: 0 1px 2px rgba(0, 0, 0, .65); }
@@ -214,6 +245,8 @@
   .gl-page *, .gl-page *::before, .gl-page *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
   .gl-page .entrance.leaving .splash-ghost, .gl-page .splash-ghost.flown { opacity: 0 !important; visibility: hidden !important; }
   .gl-page:not(.is-in) .experience { filter: none; }
+  .avatar-stage, .avatar-stage * { animation: none !important; }
+  .avatar-glow { opacity: .7; }
 }
 
 @keyframes ghost-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
@@ -231,6 +264,8 @@
 @keyframes rain-fall { from { transform: translateY(-10vh); } to { transform: translateY(110vh); } }
 @keyframes grid-drift { from { background-position: 0 0; } to { background-position: 0 48px; } }
 @keyframes spin { to { transform: rotate(360deg); } }
+@keyframes avatar-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+@keyframes avatar-breathe { 0%, 100% { opacity: .45; } 50% { opacity: .95; } }
 @keyframes pill-ring { 0% { box-shadow: 0 0 0 0 rgba(143, 108, 255, .65); } 100% { box-shadow: 0 0 0 16px rgba(143, 108, 255, 0); } }
 @keyframes card-sheen { 0%, 55% { transform: translateX(-130%); } 80%, 100% { transform: translateX(130%); } }
 @keyframes eq { 0%, 100% { transform: scaleY(.3); } 50% { transform: scaleY(1); } }
