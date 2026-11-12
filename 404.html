@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GhostLinks</title>
+  <meta name="description" content="Free, ad-free animated bio pages by GhostApps.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="GhostLinks">
+  <meta property="og:title" content="GhostLinks · Free animated bio pages">
+  <meta property="og:description" content="Free, ad-free animated bio pages by GhostApps. No code, no trackers.">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+  <p id="redirect-note">Opening GhostLinks…</p>
+  <script>
+    /* Sends /username to /?u=username on GitHub Pages, including project sites.
+       The destination rules live in js/route.js (prettyPathRedirect). */
+    (function () {
+      var parts = location.pathname.split("/").filter(Boolean);
+      var project = /\.github\.io$/i.test(location.hostname) && parts.length >= 2;
+      var base = project ? "/" + parts[0] + "/" : "/";
+      var script = document.createElement("script");
+      script.type = "module";
+      script.src = base + "js/redirect.js";
+      document.head.appendChild(script);
+    })();
+  </script>
+  <noscript><p><a href="/">GhostLinks home</a></p></noscript>
+</body>
+</html>
