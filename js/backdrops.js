@@ -10,8 +10,8 @@ function lite() {
   return window.matchMedia("(max-width: 700px), (hover: none)").matches;
 }
 
-function bits(count) {
-  const total = lite() ? Math.min(count, 8) : count;
+function bits(count, dense = false) {
+  const total = dense || !lite() ? count : Math.min(count, 8);
   const nodes = [];
   for (let i = 0; i < total; i += 1) {
     const node = document.createElement("i");
@@ -108,7 +108,8 @@ export function mountBackdropCards(container, profile, onPick) {
   for (const item of BACKDROPS) {
     const pressed = chosen === item.id;
     const stage = el("span", { class: `bd-stage bd-${item.id}`, "aria-hidden": "true" });
-    stage.append(...bits(item.id === "starfield" || item.id === "snow" || item.id === "rain" ? 8 : 5));
+    const dense = item.id === "starfield" || item.id === "snow" || item.id === "constellation";
+    stage.append(...bits(dense ? 16 : 6, true));
     const button = el("button", {
       type: "button",
       class: "market-card",

@@ -121,13 +121,47 @@
 .bd-stage, .bd-stage * { animation-play-state: paused !important; }
 .market-card.is-visible .bd-stage, .market-card.is-visible .bd-stage * { animation-play-state: running !important; }
 
+.bd-stage.bd-starfield i,
+.bd-stage.bd-snow i,
+.bd-stage.bd-rain i {
+  top: calc(6% + (var(--n) * 5.4%));
+  opacity: 1;
+  animation-name: bd-fall-tile;
+}
+.bd-stage.bd-starfield i { width: 3px; height: 3px; background: #fff; box-shadow: 0 0 5px #fff; }
+.bd-stage.bd-snow i { width: 5px; height: 5px; background: #fff; box-shadow: 0 0 4px #fff; }
+.bd-stage.bd-constellation i {
+  width: 4px; height: 4px; opacity: 1;
+  left: calc(10% + (var(--n) * 4.6%));
+  top: calc(14% + (var(--n) * 4.2%));
+  box-shadow: 12px 7px 0 #fff, -9px 11px 0 #e7dcff, 6px -8px 0 color-mix(in srgb, var(--accent, #8f6cff) 80%, white);
+  animation-name: bd-twinkle-tile;
+}
 @media (prefers-reduced-motion: reduce) {
   .backdrop, .backdrop *, .bd-stage, .bd-stage * { animation: none !important; }
+  .bd-aurora, .bd-stage.bd-aurora {
+    background:
+      radial-gradient(ellipse at 28% 38%, color-mix(in srgb, var(--accent, #8f6cff) 70%, #7fd4ff), transparent 58%),
+      radial-gradient(ellipse at 74% 68%, color-mix(in srgb, var(--accent, #8f6cff) 55%, #d7c8ff), transparent 52%),
+      linear-gradient(165deg, #1a1030, #07060f 74%);
+  }
+  .bd-aurora i { display: none; }
 }
+.gl-page.motion-off .bd-aurora,
+.gl-page .scene.backdrop-still .bd-aurora {
+  background:
+    radial-gradient(ellipse at 28% 38%, color-mix(in srgb, var(--accent, #8f6cff) 70%, #7fd4ff), transparent 58%),
+    radial-gradient(ellipse at 74% 68%, color-mix(in srgb, var(--accent, #8f6cff) 55%, #d7c8ff), transparent 52%),
+    linear-gradient(165deg, #1a1030, #07060f 74%);
+}
+.gl-page.motion-off .bd-aurora i,
+.gl-page .scene.backdrop-still .bd-aurora i { display: none; }
 
 @keyframes bd-drift { from { transform: translate3d(-6%, 0, 0); opacity: .25; } to { transform: translate3d(6%, 8%, 0); opacity: .6; } }
 @keyframes bd-mesh { from { transform: translate3d(0, 0, 0) scale(1); } to { transform: translate3d(8%, -6%, 0) scale(1.15); } }
 @keyframes bd-fall { from { transform: translate3d(0, -12vh, 0); opacity: 0; } 12% { opacity: .9; } to { transform: translate3d(10px, 110vh, 0); opacity: .15; } }
+@keyframes bd-fall-tile { from { transform: translate3d(0, 0, 0); opacity: .75; } 50% { opacity: 1; } to { transform: translate3d(2px, 16px, 0); opacity: .8; } }
+@keyframes bd-twinkle-tile { 0%, 100% { opacity: .85; } 50% { opacity: 1; } }
 @keyframes bd-bokeh { 0%, 100% { transform: translate3d(0, 0, 0) scale(.8); opacity: .35; } 50% { transform: translate3d(0, -12px, 0) scale(1.15); opacity: .8; } }
 @keyframes bd-twinkle { 0%, 100% { opacity: .25; } 50% { opacity: 1; } }
 @keyframes bd-grid {

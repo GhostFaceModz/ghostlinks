@@ -274,7 +274,7 @@ textarea.ed-input { min-height: 96px; resize: vertical; }
 .ed-preview .gl-page .fx-host { position: absolute; }
 @media (max-width: 979px) {
   .ed-layout { display: flex; flex-direction: column; }
-  .ed-shell { padding-bottom: 120px; }
+  .ed-shell { padding-bottom: 32px; }
   .ed-preview { display: none; }
   .ed-preview.is-open {
     display: block; position: relative; order: -1; z-index: 1;
@@ -284,8 +284,7 @@ textarea.ed-input { min-height: 96px; resize: vertical; }
   .ed-preview.is-open .preview-frame { height: 46svh; overflow: hidden; }
   .preview-fab {
     display: inline-flex; align-items: center; justify-content: center;
-    position: fixed; z-index: 41; left: 16px; right: auto;
-    bottom: max(12px, env(safe-area-inset-bottom));
+    position: static; z-index: auto;
     min-height: 44px; min-width: 44px; padding: 0 16px; border: 0; border-radius: 999px;
     background: #fff; color: #140e24; font-weight: 650;
   }
