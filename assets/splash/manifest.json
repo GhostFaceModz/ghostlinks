@@ -154,5 +154,109 @@
       "gold",
       "elegant"
     ]
+  },
+  {
+    "id": "splash-13",
+    "file": "splash-13.webp",
+    "name": "Haunted Forest",
+    "tags": [
+      "forest",
+      "moonlight",
+      "haunted",
+      "fog",
+      "night",
+      "dark"
+    ]
+  },
+  {
+    "id": "splash-14",
+    "file": "splash-14.webp",
+    "name": "Gold Marble",
+    "tags": [
+      "marble",
+      "gold",
+      "luxury",
+      "stone",
+      "glow",
+      "dark"
+    ]
+  },
+  {
+    "id": "splash-15",
+    "file": "splash-15.webp",
+    "name": "Vaporwave Palms",
+    "tags": [
+      "vaporwave",
+      "palms",
+      "sunset",
+      "retro",
+      "pink",
+      "teal"
+    ]
+  },
+  {
+    "id": "splash-16",
+    "file": "splash-16.webp",
+    "name": "Holographic",
+    "tags": [
+      "holographic",
+      "iridescent",
+      "abstract",
+      "chrome",
+      "dark",
+      "fashion"
+    ]
+  },
+  {
+    "id": "splash-17",
+    "file": "splash-17.webp",
+    "name": "Anime Night Sky",
+    "tags": [
+      "anime",
+      "night",
+      "stars",
+      "shooting-stars",
+      "sky",
+      "dark"
+    ]
+  },
+  {
+    "id": "splash-18",
+    "file": "splash-18.webp",
+    "name": "Lava Cave",
+    "tags": [
+      "lava",
+      "cave",
+      "magma",
+      "orange",
+      "volcanic",
+      "dark"
+    ]
+  },
+  {
+    "id": "splash-19",
+    "file": "splash-19.webp",
+    "name": "Rainy Window",
+    "tags": [
+      "rain",
+      "window",
+      "bokeh",
+      "neon",
+      "night",
+      "city"
+    ]
+  },
+  {
+    "id": "splash-20",
+    "file": "splash-20.webp",
+    "name": "Black Hole",
+    "tags": [
+      "space",
+      "black-hole",
+      "cosmos",
+      "gold",
+      "stars",
+      "dark"
+    ]
   }
 ]
