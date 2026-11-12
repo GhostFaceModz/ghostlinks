@@ -87,6 +87,53 @@ export function normalizeSplashImage(value) {
   return "";
 }
 
+const FRAME_ID = /^[a-z0-9][a-z0-9_-]{0,31}$/;
+const BACKDROP_MEDIA = /^data:(image\/gif|video\/webm|video\/mp4);base64,[a-z0-9+/=]+$/i;
+
+export const BACKDROPS = [
+  { id: "aurora", label: "Aurora waves", tag: "Sky", column: "aurora" },
+  { id: "mesh", label: "Violet mesh", tag: "Glow", column: "aurora" },
+  { id: "starfield", label: "Starfield", tag: "Night", column: "stars" },
+  { id: "matrix", label: "Matrix rain", tag: "Code", column: "rain" },
+  { id: "fog", label: "Smoke", tag: "Soft", column: "still" },
+  { id: "bokeh", label: "Bokeh", tag: "Light", column: "stars" },
+  { id: "synthwave", label: "Neon grid", tag: "Retro", column: "grid" },
+  { id: "caustics", label: "Caustics", tag: "Water", column: "still" },
+  { id: "constellation", label: "Constellation", tag: "Night", column: "stars" },
+  { id: "lava", label: "Lava lamp", tag: "Glow", column: "embers" },
+  { id: "snow", label: "Snowfall", tag: "Weather", column: "rain" },
+  { id: "rain", label: "Rain on glass", tag: "Weather", column: "rain" },
+  { id: "mist", label: "Ghostly mist", tag: "Soft", column: "still" },
+  { id: "plasma", label: "Plasma", tag: "Glow", column: "aurora" }
+];
+
+const BACKDROP_IDS = new Set(BACKDROPS.map((item) => item.id).concat("custom"));
+const LEGACY_BACKDROP = { aurora: "aurora", stars: "starfield", rain: "rain", grid: "synthwave", embers: "lava", still: "mist" };
+
+export function normalizeBackdrop(value) {
+  if (value == null || String(value).trim() === "") return "";
+  return BACKDROP_IDS.has(value) ? value : "";
+}
+
+export function normalizeBackdropMedia(value) {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+  if (BACKDROP_MEDIA.test(raw) && raw.length <= DATA_IMAGE_MAX) return raw;
+  return "";
+}
+
+export function columnBackground(id) {
+  return BACKDROPS.find((item) => item.id === id)?.column || "still";
+}
+
+export function activeBackdrop(profile = {}) {
+  const chosen = profile.settings?.background;
+  const media = normalizeBackdropMedia(profile.settings?.background_media);
+  if (chosen === "custom" && media) return "custom";
+  if (BACKDROPS.some((item) => item.id === chosen)) return chosen;
+  return LEGACY_BACKDROP[profile.background] || "aurora";
+}
+
 export function normalizeSettings(input = {}) {
   const splash = SPLASH_IDS.has(input.splash) ? input.splash : "ghost";
   const effects = [];
@@ -96,10 +143,18 @@ export function normalizeSettings(input = {}) {
     effects.push(id);
     if (effects.length >= MAX_EFFECTS) break;
   }
+  const background_media = normalizeBackdropMedia(input.background_media);
+  let background = normalizeBackdrop(input.background);
+  if (background === "custom" && !background_media) background = "";
+  if (!background && background_media) background = "custom";
+  const frame = String(input.avatar_frame || "").trim().toLowerCase();
   return {
     splash,
     effects,
     splash_image: normalizeSplashImage(input.splash_image),
-    logo_image: normalizeLogoImage(input.logo_image)
+    logo_image: normalizeLogoImage(input.logo_image),
+    avatar_frame: FRAME_ID.test(frame) ? frame : "",
+    background,
+    background_media
   };
 }

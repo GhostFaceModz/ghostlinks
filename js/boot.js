@@ -5,7 +5,7 @@ const username = (params.get("u") || "").trim().toLowerCase();
 const app = document.getElementById("app");
 
 function loadRouteStyles() {
-  for (const file of ["profile.css", "looks.css"]) {
+  for (const file of ["profile.css", "looks.css", "backdrops.css"]) {
     if ([...document.querySelectorAll('link[rel="stylesheet"]')].some((link) => link.href.endsWith(`/${file}`) || link.href.endsWith(file))) continue;
     const link = document.createElement("link");
     link.rel = "stylesheet";
