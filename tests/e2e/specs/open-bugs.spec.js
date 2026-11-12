@@ -135,8 +135,6 @@ test.describe("images", () => {
   });
 
   test("each assets/splash image is under 300 KB", async ({ request }) => {
-    // TODO: remove when fixed. splash-11, -13, -14 and -18 are over 300 KB
-    knownBug("splash-11, -13, -14 and -18 are over 300 KB");
     test.skip(test.info().project.name !== "desktop", "HTTP checks only need to run once");
     const items = await (await request.get(appUrl("assets/splash/manifest.json"))).json();
     const big = [];
