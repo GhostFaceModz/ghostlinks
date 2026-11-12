@@ -1,0 +1,32 @@
+[
+  {
+    "id": "neon-ring",
+    "label": "Neon Ring",
+    "file": "frame-neon-ring.png"
+  },
+  {
+    "id": "gold-laurel",
+    "label": "Gold Laurel",
+    "file": "frame-gold-laurel.png"
+  },
+  {
+    "id": "ghost-flames",
+    "label": "Ghost Flames",
+    "file": "frame-ghost-flames.png"
+  },
+  {
+    "id": "glitch",
+    "label": "Glitch",
+    "file": "frame-glitch.png"
+  },
+  {
+    "id": "starry",
+    "label": "Starry",
+    "file": "frame-starry.png"
+  },
+  {
+    "id": "violet-halo",
+    "label": "Violet Halo",
+    "file": "frame-violet-halo.png"
+  }
+]
