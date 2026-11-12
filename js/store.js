@@ -47,6 +47,7 @@ export function fromRow(row) {
     font: row.font,
     enterScreen: row.enter_screen !== false,
     published: row.published !== false,
+    settings: row.settings && typeof row.settings === "object" ? row.settings : {},
     links: Array.isArray(row.links) ? row.links.map((link) => ({ ...link })) : [],
     tracks: editorTracks(row.youtube_tracks)
   };
@@ -67,7 +68,8 @@ function toRow(profile, userId) {
     links: clean.links,
     youtube_tracks: clean.tracks,
     enter_screen: clean.enterScreen,
-    published: clean.published
+    published: clean.published,
+    settings: clean.settings
   };
 }
 
@@ -120,7 +122,7 @@ export async function signOut() {
 }
 
 const PROFILES = "ghostlinks_profiles";
-const PROFILE_COLUMNS = "username,display_name,bio,avatar_url,theme,background,accent_color,font,links,youtube_tracks,enter_screen,published";
+const PROFILE_COLUMNS = "username,display_name,bio,avatar_url,theme,background,accent_color,font,links,youtube_tracks,enter_screen,published,settings";
 
 export async function loadOwn(session) {
   if (isDemoMode() || !session) {

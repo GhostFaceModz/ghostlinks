@@ -30,7 +30,7 @@ GhostLinks shares the existing GhostApps Supabase project. It does not create a 
 
 Clear both `config.js` values to fall back to demo mode. `?u=demo` stays available either way.
 
-1. In the SQL editor, run `supabase/migrations/20261112050000_ghostlinks_profiles.sql`. It only creates `ghostlinks_` tables, functions, policies, and a trigger. Re-running it is safe.
+1. In the SQL editor, run `supabase/migrations/20261112050000_ghostlinks_profiles.sql`, then `supabase/migrations/20261112061000_profile_settings.sql`, then `supabase/migrations/20261112070000_ghostlinks_settings_guard.sql`. The first creates `ghostlinks_` objects. The second adds `settings`. The third teaches the guard which splash styles and effects are allowed. Re-running them is safe.
 2. Authentication → URL configuration. Leave the existing Site URL alone if GhostGames or GhostFlix already use it. Add these redirect URLs:
    - `https://ghostfacemodz.github.io/ghostlinks/editor.html`
    - `https://ghostfacemodz.github.io/ghostlinks/`
@@ -53,7 +53,8 @@ View counts are stored in this browser only (`visits on this device`). They are 
 - Username, display name, bio, avatar (https URL or a small image kept on the row)
 - Up to 10 links. Discord, YouTube, TikTok, X, Instagram, Twitch, GitHub, and Spotify pick an icon from the URL. Anything else uses a generic icon.
 - Six themes, six backgrounds, an accent colour, and six fonts
-- Click-to-enter on or off
+- Click-to-enter on or off, with 13 splash styles
+- Stackable page effects (snow, fireflies, glow, a gradient name, and the rest), saved in the profile `settings` object
 - Up to five YouTube or YouTube Music tracks
 
 Backgrounds are CSS and a small canvas. Phones use fewer particles, skip the expensive blur, and draw at 30fps. Reduced motion and the Motion button turn the animation off. The splash ghost uses the same `.splash-ghost.flown` lock as the GhostFaceZen page so it cannot snap back onto the card after it leaves.
