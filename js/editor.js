@@ -8,9 +8,11 @@ import {
   parseYouTubeId,
   platformFromUrl,
   platformLabel,
+  profileIssues,
   safeAvatar
 } from "./model.js";
-import { MAX_EFFECTS, activeBackdrop, normalizeSettings } from "./looks.js";
+import { MAX_EFFECTS, TEMPLATES, activeBackdrop, normalizeSettings } from "./looks.js";
+import { mountFramePicker } from "./frames.js";
 import { mountEffectCards, mountSplashCards, toggleEffect } from "./market.js";
 import { mountLogoPicker } from "./logo-picker.js";
 import { mountBackdropCards, readBackdropFile } from "./backdrops.js";
@@ -106,11 +108,76 @@ function renderEditor(app, profile, persistedUsername, session, demo) {
   const accent = el("input", { id: "accent", type: "color", value: normalizeAccent(profile.accent), "aria-label": "Accent colour" });
   const accentText = el("input", { id: "accent-hex", class: "ed-input ed-hex", value: normalizeAccent(profile.accent), maxlength: "7", "aria-label": "Accent hex" });
 
+  const copyButton = el("button", { type: "button", class: "ed-text", disabled: true }, "Copy link");
+  const shareButton = el("button", { type: "button", class: "ed-text", disabled: true }, "Share");
+  const history = [];
+  const future = [];
+  let applying = false;
+  let saveTimer = 0;
+  let savedJson = JSON.stringify(profile);
+  const saveState = el("p", { class: "ed-status", id: "autosave-status", role: "status", "data-state": "saved" }, "Saved");
+  const undoButton = el("button", { type: "button", class: "ed-text", disabled: true }, "Undo");
+  const redoButton = el("button", { type: "button", class: "ed-text", disabled: true }, "Redo");
+
+  function snapshot() {
+    return JSON.stringify(profile);
+  }
+
+  function syncHistory() {
+    undoButton.disabled = history.length < 2;
+    redoButton.disabled = future.length === 0;
+  }
+
+  function scheduleAutosave() {
+    window.clearTimeout(saveTimer);
+    const json = snapshot();
+    if (json === savedJson) {
+      saveState.textContent = "Saved";
+      saveState.dataset.state = "saved";
+      return;
+    }
+    if (profileIssues(profile).length) {
+      saveState.textContent = "Unsaved";
+      saveState.dataset.state = "unsaved";
+      return;
+    }
+    saveState.textContent = "Saving…";
+    saveState.dataset.state = "saving";
+    saveTimer = window.setTimeout(async () => {
+      try {
+        const saved = await saveProfile(profile, session);
+        savedJson = JSON.stringify(saved);
+        saveState.textContent = demo ? "Saved in this browser" : "Saved";
+        saveState.dataset.state = "saved";
+      } catch (error) {
+        saveState.textContent = error.message || "Couldn't save";
+        saveState.dataset.state = "unsaved";
+      }
+    }, 900);
+  }
+
+  function remember() {
+    if (applying) return;
+    const json = snapshot();
+    if (history[history.length - 1] === json) {
+      syncHistory();
+      return;
+    }
+    history.push(json);
+    if (history.length > 40) history.shift();
+    future.length = 0;
+    syncHistory();
+    scheduleAutosave();
+  }
+
   function refresh() {
     pageApi?.update(profile);
     const named = String(profile.username || "").trim();
     viewLink.href = named ? publicHref(named) : `${homeHref()}?u=demo`;
     viewLink.textContent = named ? `View /${named}` : "View the demo";
+    copyButton.disabled = !named;
+    shareButton.disabled = !named;
+    remember();
   }
 
   function scheduleNameCheck() {
@@ -201,7 +268,7 @@ function renderEditor(app, profile, persistedUsername, session, demo) {
 
   const themeRow = el("div", { class: "choice-row", role: "radiogroup", "aria-label": "Theme" });
   for (const [id, theme] of Object.entries(THEMES)) {
-    const button = el("button", { type: "button", class: "swatch", role: "radio", "aria-checked": String(profile.theme === id) }, [
+    const button = el("button", { type: "button", class: "swatch", role: "radio", "data-value": id, "aria-checked": String(profile.theme === id) }, [
       el("span", { class: "swatch-chip", style: `--swatch:${theme.accent};--swatch-base:${theme.base}` }),
       theme.label
     ]);
@@ -268,7 +335,7 @@ function renderEditor(app, profile, persistedUsername, session, demo) {
 
   const fontRow = el("div", { class: "choice-row", role: "radiogroup", "aria-label": "Font" });
   for (const [id, font] of Object.entries(FONTS)) {
-    const button = el("button", { type: "button", class: "choice choice-font", role: "radio", style: `font-family:${font.display}`, "aria-checked": String(profile.font === id) }, font.label);
+    const button = el("button", { type: "button", class: "choice choice-font", role: "radio", "data-value": id, style: `font-family:${font.display}`, "aria-checked": String(profile.font === id) }, font.label);
     button.addEventListener("click", () => {
       profile.font = id;
       refresh();
@@ -380,6 +447,134 @@ function renderEditor(app, profile, persistedUsername, session, demo) {
   const publishSwitch = switchButton("Published — anyone with the link can view it", () => profile.published !== false, (value) => { profile.published = value; }, () => refresh());
 
   const save = el("button", { class: "land-button", type: "submit" }, demo ? "Save in this browser" : "Save page");
+  function markRadios(group, value) {
+    group.querySelectorAll('[role="radio"]').forEach((node) => {
+      const on = node.dataset.value === value;
+      node.setAttribute("aria-checked", on ? "true" : "false");
+      node.tabIndex = on ? 0 : -1;
+    });
+  }
+
+  function writeControls() {
+    username.value = profile.username || "";
+    displayName.value = profile.displayName || "";
+    bio.value = profile.bio || "";
+    bioCount.textContent = `${bio.value.length}/${LIMITS.bio}`;
+    avatarUrl.value = profile.avatarUrl?.startsWith("data:") ? "" : (profile.avatarUrl || "");
+    accent.value = normalizeAccent(profile.accent);
+    accentText.value = normalizeAccent(profile.accent);
+    markRadios(themeRow, profile.theme);
+    bgRow.querySelectorAll(".market-card").forEach((node) => {
+      node.setAttribute("aria-pressed", String(node.dataset.backdrop === profile.settings.background));
+    });
+    markRadios(fontRow, profile.font);
+    renderLinks();
+    renderTracks();
+    mountSplashCards(splashRow, profile, (id) => {
+      profile.settings.splash = id;
+      refresh();
+      pageApi?.replay();
+    });
+    mountEffectCards(effectRow, profile, (id) => {
+      const result = toggleEffect(profile, id, () => {
+        status.textContent = `Up to ${MAX_EFFECTS} effects at once. Turn one off first.`;
+      });
+      if (result != null) refresh();
+      return result;
+    });
+    mountSplashGallery(gallery, profile, (value) => {
+      profile.settings.splash_image = value;
+      refresh();
+    }, (message) => { status.textContent = message; });
+    mountLogoPicker(logoPicker, profile, (value) => {
+      profile.settings.logo_image = value;
+      refresh();
+    }, (message) => { status.textContent = message; });
+    mountFramePicker(framePicker, profile, (value) => {
+      profile.settings.avatar_frame = value;
+      refresh();
+    });
+  }
+
+  function applyHistory(json) {
+    applying = true;
+    const next = JSON.parse(json);
+    for (const key of Object.keys(profile)) delete profile[key];
+    Object.assign(profile, next);
+    writeControls();
+    applying = false;
+    pageApi?.update(profile);
+    syncHistory();
+    scheduleAutosave();
+  }
+
+  undoButton.addEventListener("click", () => {
+    if (history.length < 2) return;
+    future.push(history.pop());
+    applyHistory(history[history.length - 1]);
+  });
+  redoButton.addEventListener("click", () => {
+    const next = future.pop();
+    if (!next) return;
+    history.push(next);
+    applyHistory(next);
+  });
+
+  function pageUrl() {
+    const named = String(profile.username || "").trim();
+    if (!named) return "";
+    return new URL(publicHref(named), window.location.origin).href;
+  }
+  copyButton.addEventListener("click", async () => {
+    const url = pageUrl();
+    if (!url) return;
+    try {
+      await navigator.clipboard.writeText(url);
+      saveState.textContent = "Link copied";
+    } catch {
+      saveState.textContent = url;
+    }
+  });
+  shareButton.addEventListener("click", async () => {
+    const url = pageUrl();
+    if (!url) return;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: profile.displayName || "GhostLinks", url });
+        return;
+      } catch { /* dismissed */ }
+    }
+    copyButton.click();
+  });
+
+  const templateRow = el("div", { class: "choice-row", role: "group", "aria-label": "Templates" });
+  for (const template of TEMPLATES) {
+    const button = el("button", { type: "button", class: "choice" }, template.name);
+    button.addEventListener("click", () => {
+      const backdrop = profile.settings.background;
+      const backdropMedia = profile.settings.background_media;
+      profile.theme = template.theme;
+      profile.accent = template.accent;
+      profile.settings = normalizeSettings({
+        ...profile.settings,
+        splash: template.splash,
+        splash_image: template.splash_image,
+        effects: template.effects.slice(),
+        background: backdrop,
+        background_media: backdropMedia
+      });
+      writeControls();
+      refresh();
+      pageApi?.replay();
+    });
+    templateRow.append(button);
+  }
+  const framePicker = el("div", { class: "frame-picker" });
+  mountFramePicker(framePicker, profile, (value) => {
+    profile.settings.avatar_frame = value;
+    refresh();
+  });
+
   const form = el("form", { class: "ed-form", id: "editor-form" }, [
     demo ? el("p", { class: "ed-banner" }, "Demo mode. This page stays in this browser until Supabase is connected in config.js.") : null,
     session ? el("p", { class: "ed-banner" }, `Signed in${displaySession(session)}.`) : null,
@@ -410,6 +605,11 @@ function renderEditor(app, profile, persistedUsername, session, demo) {
       bgRow,
       el("label", { class: "ed-file-label", for: "backdrop-file" }, "Or a short GIF or video, under 130 KB"),
       bgFile,
+      el("p", { class: "ed-label" }, "Templates"),
+      el("p", { class: "ed-hint" }, "One click sets the theme, entrance, image, and effects. Your name, links, and songs stay."),
+      templateRow,
+      el("p", { class: "ed-label" }, "Avatar frame"),
+      framePicker,
       el("p", { class: "ed-label" }, "Click-to-enter style"),
       splashRow,
       el("p", { class: "ed-label" }, "Ghost mark"),
@@ -434,7 +634,7 @@ function renderEditor(app, profile, persistedUsername, session, demo) {
       trackList,
       addTrack
     ]),
-    el("div", { class: "ed-savebar" }, [save, viewLink]),
+    el("div", { class: "ed-savebar" }, [save, saveState, viewLink, copyButton, shareButton]),
     status
   ]);
   form.addEventListener("submit", async (event) => {
@@ -474,6 +674,8 @@ function renderEditor(app, profile, persistedUsername, session, demo) {
   const header = el("header", { class: "ed-header" }, [
     el("a", { class: "wordmark", href: homeHref() }, [svgIcon("ghost"), el("span", {}, ["GHOST", el("span", {}, "LINKS")])]),
     el("div", { class: "ed-header-actions" }, [
+      undoButton,
+      redoButton,
       el("a", { class: "ed-text", href: "#preview" }, "Skip to preview"),
       demo ? reset : null,
       session ? signOutButton : null

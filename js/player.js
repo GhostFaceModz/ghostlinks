@@ -307,6 +307,14 @@ export function bindPlayer(root, initialTracks) {
       showMeta();
     },
     pause() { pause(); },
+    toggleMute() {
+      muted = !muted;
+      if (!muted && level === 0) level = 30;
+      volume.value = String(muted ? 0 : level);
+      applyVolume();
+      syncMute();
+      return muted || level === 0;
+    },
     setTracks(next) {
       tracks = next.slice();
       if (!tracks.length) {

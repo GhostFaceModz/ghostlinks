@@ -129,7 +129,9 @@ button { cursor: pointer; }
   background: linear-gradient(180deg, rgba(28, 22, 52, .9), rgba(10, 8, 20, .92));
   border: 1px solid rgba(185, 166, 255, .35);
   box-shadow: 0 30px 80px -36px #000, 0 0 80px -28px rgba(143, 108, 255, .8);
+  animation: mock-float 6.5s ease-in-out infinite;
 }
+@keyframes mock-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 .land-mock-banner { height: 84px; margin: -18px -16px 0; border-radius: 28px 28px 0 0; background: radial-gradient(circle at 80% 30%, #b9a6ff, transparent 42%), linear-gradient(160deg, #2a2150, #120c22); }
 .land-mock-avatar { width: 72px; height: 72px; margin: -36px auto 8px; border-radius: 50%; background: radial-gradient(circle at 50% 42%, #fff 0 18%, #d9ccff 19% 34%, #8f6cff 35% 70%, #1a1330 71%); border: 4px solid #120e22; box-shadow: 0 0 0 2px #8f6cff; }
 .land-mock h2 { margin: 0; font-family: var(--font-display); font-size: 28px; }
@@ -187,6 +189,12 @@ textarea.ed-input { min-height: 96px; resize: vertical; }
 .ed-right { text-align: right; }
 .ed-banner { margin: 8px 0; padding: 10px 12px; border-radius: 12px; background: rgba(143, 108, 255, .12); color: #e4dcff; }
 .ed-status { min-height: 1.4em; color: #ddd6ff; }
+.ed-status[data-state="saved"] { color: #b6f3d4; }
+.ed-status[data-state="saving"] { color: #e9e4ff; }
+.ed-status[data-state="unsaved"] { color: #ffb4c8; }
+.frame-presets { display: flex; flex-wrap: wrap; gap: 8px; min-width: 0; }
+.frame-choice { display: inline-flex; flex-direction: column; align-items: center; gap: 4px; min-height: 96px; padding: 8px; }
+.frame-choice img { width: 64px; height: 64px; object-fit: contain; background: none; }
 .choice-row, .splash-grid, .splash-presets, .market-grid, .market-card, .market-copy, .ed-row, .ed-row-fields { min-width: 0; }
 .choice-row { display: flex; flex-wrap: wrap; gap: 8px; }
 .splash-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
@@ -272,6 +280,6 @@ textarea.ed-input { min-height: 96px; resize: vertical; }
 @media (prefers-reduced-motion: reduce) {
   * { scroll-behavior: auto !important; }
   .switch-ui::after { transition: none; }
-  .land-mesh span { animation: none !important; }
+  .land-mesh span, .land-mock { animation: none !important; }
 }
 @keyframes mesh-drift { from { transform: translate3d(0, 0, 0) scale(1); } to { transform: translate3d(4vw, 3vh, 0) scale(1.08); } }

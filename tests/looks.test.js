@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import test from "node:test";
-import { BACKDROPS, EFFECTS, GIF_RAW_MAX, MAX_EFFECTS, SPLASHES, activeBackdrop, normalizeLogoImage, normalizeSettings, normalizeSplashImage, splashFullPath, splashPreviewPath } from "../js/looks.js";
-import { demoProfile } from "../js/model.js";
+import { BACKDROPS, EFFECTS, GIF_RAW_MAX, MAX_EFFECTS, SPLASHES, TEMPLATES, activeBackdrop, normalizeAvatarFrame, normalizeLogoImage, normalizeSettings, normalizeSplashImage, splashFullPath, splashPreviewPath } from "../js/looks.js";
+import { demoProfile, profileBadges } from "../js/model.js";
 
 test("there are at least 12 splashes and 15 effects", () => {
   assert.ok(SPLASHES.length >= 12);
@@ -85,8 +85,41 @@ test("animated backgrounds are known ids behind the card", () => {
   for (const item of BACKDROPS) assert.match(sql, new RegExp(`'${item.id}'`));
   assert.match(sql, /background_media/);
   assert.match(sql, /logo_image/);
+  assert.match(sql, /avatar_frame/);
   assert.doesNotMatch(sql, /alter table public\.profiles/);
   assert.doesNotMatch(sql, /drop table/i);
+});
+
+test("templates, frames, and demo badges stay in range", () => {
+  assert.equal(TEMPLATES.length, 6);
+  for (const template of TEMPLATES) {
+    const settings = normalizeSettings({
+      background: "plasma",
+      background_media: "",
+      avatar_frame: "neon-ring",
+      splash: template.splash,
+      splash_image: template.splash_image,
+      effects: template.effects
+    });
+    assert.equal(settings.splash, template.splash);
+    assert.equal(settings.splash_image, template.splash_image);
+    assert.equal(settings.background, "plasma");
+    assert.equal(settings.avatar_frame, "neon-ring");
+    assert.ok(settings.effects.length >= 3);
+  }
+  assert.equal(normalizeAvatarFrame("Gold-Ring"), "gold-ring");
+  assert.equal(normalizeAvatarFrame("neon-ring"), "neon-ring");
+  assert.equal(normalizeAvatarFrame("../x"), "");
+  const badges = profileBadges(demoProfile());
+  assert.ok(badges.some((badge) => badge.id === "discord"));
+  assert.ok(badges.some((badge) => badge.id === "music"));
+  const views = fs.readFileSync(new URL("../supabase/migrations/20261112110000_ghostlinks_views.sql", import.meta.url), "utf8");
+  assert.match(views, /ghostlinks_views/);
+  assert.match(views, /ghostlinks_record_view/);
+  assert.match(views, /6 hours/);
+  assert.match(views, /enable row level security/);
+  assert.match(views, /force row level security/);
+  assert.doesNotMatch(views, /alter table public\.profiles/);
 });
 
 test("the demo page turns on a splash and several effects", () => {

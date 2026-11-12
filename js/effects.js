@@ -56,6 +56,7 @@ function mountCanvas(scene, kind) {
   let particles = [];
   let violetSprite = null;
   let cyanSprite = null;
+  let sprite = null;
   let running = true;
   let frame = 0;
   let last = 0;
@@ -108,7 +109,7 @@ function mountCanvas(scene, kind) {
   }
 
   function drawShooting(delta) {
-    if (lite || kind !== "stars") return;
+    if (kind !== "stars") return;
     nextShot -= delta * 16.67;
     if (nextShot <= 0) {
       nextShot = 4000 + Math.random() * 5000;
@@ -206,11 +207,9 @@ function addRain(scene) {
 
 function addAurora(scene) {
   const mesh = document.createElement("div");
-  mesh.className = "aurora";
-  mesh.append(Object.assign(document.createElement("span"), { className: "blob b1" }));
-  mesh.append(Object.assign(document.createElement("span"), { className: "blob b2" }));
-  mesh.append(Object.assign(document.createElement("span"), { className: "blob b3" }));
+  mesh.className = "nebula";
   scene.append(mesh);
+  return mountCanvas(scene, "stars");
 }
 
 function addGrid(scene) {
@@ -223,7 +222,7 @@ export function mountBackground(scene, name) {
   scene.replaceChildren();
   scene.dataset.bg = BACKGROUNDS_SAFE(name);
   let canvasApi = null;
-  if (scene.dataset.bg === "aurora") addAurora(scene);
+  if (scene.dataset.bg === "aurora") canvasApi = addAurora(scene);
   else if (scene.dataset.bg === "stars") canvasApi = mountCanvas(scene, "stars");
   else if (scene.dataset.bg === "embers") canvasApi = mountCanvas(scene, "embers");
   else if (scene.dataset.bg === "rain") addRain(scene);
