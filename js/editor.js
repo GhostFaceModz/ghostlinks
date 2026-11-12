@@ -26,7 +26,8 @@ import {
   isDemoMode,
   loadOwn,
   saveProfile,
-  signInWithDiscord,
+  signInWithMagicLink,
+  signInWithProvider,
   signOut,
   usernameAvailable
 } from "./store.js";
@@ -57,21 +58,37 @@ export async function mountEditor(app) {
 function wireSignIn(oauthError) {
   const card = document.getElementById("editor-signin");
   const status = document.getElementById("editor-status");
-  const button = document.getElementById("discord-signin");
   if (status && oauthError) status.textContent = oauthError;
-  if (!button || button.dataset.wired === "true") return;
-  button.dataset.wired = "true";
-  button.addEventListener("click", async () => {
-    button.disabled = true;
-    if (status) status.textContent = "Redirecting to Discord…";
+  if (!card || card.dataset.wired === "true") return;
+  card.dataset.wired = "true";
+  card.querySelectorAll("[data-provider]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const provider = button.getAttribute("data-provider");
+      button.disabled = true;
+      if (status) status.textContent = `Redirecting to ${provider}…`;
+      try {
+        await signInWithProvider(provider);
+      } catch (error) {
+        button.disabled = false;
+        if (status) status.textContent = error.message || "Sign-in didn't start.";
+      }
+    });
+  });
+  const magic = document.getElementById("magic-link");
+  magic?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const email = document.getElementById("magic-email")?.value || "";
+    const submit = magic.querySelector("button");
+    if (submit) submit.disabled = true;
+    if (status) status.textContent = "Sending a magic link…";
     try {
-      await signInWithDiscord();
+      await signInWithMagicLink(email);
+      if (status) status.textContent = "Check your email for the sign-in link.";
     } catch (error) {
-      button.disabled = false;
-      if (status) status.textContent = error.message || "Discord sign-in didn't start.";
+      if (submit) submit.disabled = false;
+      if (status) status.textContent = error.message || "The magic link didn't send.";
     }
   });
-  if (!card) return;
 }
 
 function renderEditor(app, profile, persistedUsername, session, demo) {

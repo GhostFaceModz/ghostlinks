@@ -108,12 +108,12 @@ export async function currentSession() {
   return data.session ?? null;
 }
 
-export async function signInWithDiscord() {
-  const supabase = await getClient();
-  const redirectTo = editorRedirectUrl(window.location.origin, window.location.pathname, window.location.hostname);
-  // Discord's provider config already asks for identify and email.
-  // Passing them again repeats the scopes on the authorize URL.
-  // Clearing storage locally avoids a POST /logout that 401s when no one is signed in.
+function editorReturnUrl() {
+  return editorRedirectUrl(window.location.origin, window.location.pathname, window.location.hostname);
+}
+
+function clearStaleAuth() {
+  // Do not POST /logout. A stale local token makes that call 401.
   try {
     const keys = [];
     for (let i = 0; i < localStorage.length; i += 1) keys.push(localStorage.key(i));
@@ -123,9 +123,28 @@ export async function signInWithDiscord() {
       }
     }
   } catch { /* private mode */ }
+}
+
+export async function signInWithProvider(provider) {
+  const supabase = await getClient();
+  clearStaleAuth();
   const { error } = await supabase.auth.signInWithOAuth({
-    provider: "discord",
-    options: { redirectTo }
+    provider,
+    options: { redirectTo: editorReturnUrl() }
+  });
+  if (error) throw error;
+}
+
+export async function signInWithDiscord() {
+  return signInWithProvider("discord");
+}
+
+export async function signInWithMagicLink(email) {
+  const supabase = await getClient();
+  clearStaleAuth();
+  const { error } = await supabase.auth.signInWithOtp({
+    email: String(email || "").trim(),
+    options: { emailRedirectTo: editorReturnUrl(), shouldCreateUser: true }
   });
   if (error) throw error;
 }

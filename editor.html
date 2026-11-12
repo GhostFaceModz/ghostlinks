@@ -35,8 +35,19 @@
     <main id="editor-signin" class="notice-card editor-gate">
       <p class="eyebrow">GhostLinks</p>
       <h1>Sign in to build your page</h1>
-      <p>Discord is only used so the page belongs to you. Everyone can still read a published page. No ads, no trackers.</p>
-      <button id="discord-signin" class="land-button" type="button">Sign in with Discord</button>
+      <p>Sign in so the page belongs to you. Everyone can still read a published page. No ads, no trackers.</p>
+      <div class="auth-providers">
+        <button class="auth-btn auth-google" type="button" data-provider="google">Continue with Google</button>
+        <button class="auth-btn auth-discord" type="button" data-provider="discord">Continue with Discord</button>
+        <button class="auth-btn auth-twitch" type="button" data-provider="twitch">Continue with Twitch</button>
+        <button class="auth-btn auth-facebook" type="button" data-provider="facebook">Continue with Facebook</button>
+      </div>
+      <p class="auth-or"><span>or email</span></p>
+      <form id="magic-link" class="auth-email-row">
+        <label class="sr-only" for="magic-email">Email</label>
+        <input id="magic-email" type="email" name="email" autocomplete="email" placeholder="Email" required>
+        <button class="auth-btn auth-email" type="submit">Email me a magic link</button>
+      </form>
       <a class="land-button land-button-quiet" href="./?u=demo">View the demo</a>
       <p id="editor-status" class="ed-status" role="status"></p>
     </main>
