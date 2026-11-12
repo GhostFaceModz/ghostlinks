@@ -1,0 +1,32 @@
+[
+  {
+    "id": "cute",
+    "label": "Cute Glow",
+    "file": "ghost-cute.png"
+  },
+  {
+    "id": "cool",
+    "label": "Neon Cool",
+    "file": "ghost-cool.png"
+  },
+  {
+    "id": "gold",
+    "label": "Golden Smile",
+    "file": "ghost-gold.png"
+  },
+  {
+    "id": "hooded",
+    "label": "Hooded",
+    "file": "ghost-hooded.png"
+  },
+  {
+    "id": "arcade",
+    "label": "Arcade",
+    "file": "ghost-arcade.png"
+  },
+  {
+    "id": "line",
+    "label": "Line Glow",
+    "file": "ghost-line.png"
+  }
+]
