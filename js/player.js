@@ -160,9 +160,14 @@ export function bindPlayer(root, initialTracks) {
     else player.cueVideoById(id);
   }
 
+  let armed = false;
   function play() {
     wantPlay = true;
     if (!tracks.length) return;
+    if (!armed) {
+      setState("Ready when you enter");
+      return;
+    }
     if (!player || !ready) {
       setState("Loading…");
       ensure();
@@ -223,7 +228,7 @@ export function bindPlayer(root, initialTracks) {
     loadApi().then(() => {
       if (destroyed || player || !window.YT?.Player) return;
       const origin = /^https?:/.test(location.protocol) ? location.origin : undefined;
-      const vars = { autoplay: 0, controls: 0, disablekb: 1, fs: 0, modestbranding: 1, playsinline: 1, rel: 0, iv_load_policy: 3 };
+      const vars = { autoplay: 0, controls: 0, disablekb: 1, fs: 0, host: "https://www.youtube-nocookie.com", modestbranding: 1, playsinline: 1, rel: 0, iv_load_policy: 3 };
       if (origin) vars.origin = origin;
       player = new window.YT.Player(slotId, {
         width: 200,
@@ -281,11 +286,17 @@ export function bindPlayer(root, initialTracks) {
   showMeta();
   syncPlay();
   syncMute();
-  setState(tracks.length ? "Ready when you are" : "No tracks yet");
-  if (tracks.length) ensure();
+  setState(tracks.length ? "Ready when you enter" : "No tracks yet");
 
   return {
     play,
+    activate() {
+      armed = true;
+      wantPlay = true;
+      if (!tracks.length) return;
+      ensure();
+      if (ready) play();
+    },
     pause() { pause(); },
     setTracks(next) {
       tracks = next.slice();
@@ -297,7 +308,7 @@ export function bindPlayer(root, initialTracks) {
       }
       if (!tracks[index]) index = 0;
       showMeta();
-      ensure();
+      if (armed) ensure();
       if (player && ready) player.cueVideoById(tracks[index].id);
     },
     destroy() {

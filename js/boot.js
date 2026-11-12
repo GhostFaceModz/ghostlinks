@@ -1,15 +1,23 @@
-import { initLanding } from "./landing.js";
-import { mountEditor } from "./editor.js";
-import { mountPublic } from "./public.js";
-import { baseFromPath } from "./route.js";
+import { baseFromPath, siteBase } from "./route.js";
 
 const params = new URLSearchParams(window.location.search);
 const username = (params.get("u") || "").trim().toLowerCase();
 const app = document.getElementById("app");
 
+function loadRouteStyles() {
+  for (const file of ["profile.css", "looks.css"]) {
+    if ([...document.querySelectorAll('link[rel="stylesheet"]')].some((link) => link.href.endsWith(`/${file}`) || link.href.endsWith(file))) continue;
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = `${siteBase()}css/${file}`;
+    document.head.append(link);
+  }
+}
+
 async function boot() {
   if (!app) return;
   if (document.body.dataset.route === "editor") {
+    const { mountEditor } = await import("./editor.js");
     await mountEditor(app);
     return;
   }
@@ -18,9 +26,12 @@ async function boot() {
     return;
   }
   if (username) {
+    loadRouteStyles();
+    const { mountPublic } = await import("./public.js");
     await mountPublic(app, username, { theme: params.get("theme") || "", background: params.get("bg") || "" });
     return;
   }
+  const { initLanding } = await import("./landing.js");
   await initLanding();
 }
 

@@ -1,6 +1,7 @@
 /* Splash styles and stackable effects. Motion off and reduced-motion win. */
 
 .gl-page .splash-stage { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.gl-page .splash-stage.has-image { background-size: cover; background-position: center; opacity: .9; }
 .gl-page .fx-host { position: absolute; inset: 0; z-index: 3; pointer-events: none; overflow: hidden; }
 .gl-page.is-live .fx-host { position: fixed; }
 .gl-page .fx-particles, .gl-page .fx-rain, .gl-page .fx-smoke, .gl-page .fx-aurora, .gl-page .fx-ghosts { position: absolute; inset: 0; }
