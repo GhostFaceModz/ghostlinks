@@ -138,6 +138,11 @@ textarea.ed-input { min-height: 96px; resize: vertical; }
 .ed-banner { margin: 8px 0; padding: 10px 12px; border-radius: 12px; background: rgba(143, 108, 255, .12); color: #e4dcff; }
 .ed-status { min-height: 1.4em; color: #ddd6ff; }
 .choice-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.splash-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.splash-pick { display: grid; gap: 6px; justify-items: stretch; text-align: center; border-radius: 16px; padding: 8px; min-height: 96px; }
+.splash-mini { position: relative; height: 52px; border-radius: 10px; overflow: hidden; background: #100c1c; display: grid; place-items: center; }
+.splash-mini i { font-family: "Unbounded", sans-serif; font-style: normal; font-size: 14px; position: relative; z-index: 1; }
+.splash-mini b { position: absolute; width: 16px; height: 16px; border-radius: 50%; background: #fff; top: 6px; left: 10px; }
 .choice, .swatch, .ed-text, .switch {
   border: 1px solid var(--line); background: #ffffff08; color: var(--ink); border-radius: 999px; min-height: 40px; padding: 0 12px;
 }
@@ -170,6 +175,7 @@ textarea.ed-input { min-height: 96px; resize: vertical; }
 
 @media (min-width: 720px) {
   .themes, .steps { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .splash-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .ed-row { grid-template-columns: 72px minmax(0, 1fr); }
   .ed-row-actions { grid-column: 2; }
 }

@@ -1,7 +1,9 @@
 import { el } from "./dom.js";
 import { svgIcon } from "./icons.js";
 import { FONTS, THEMES, normalizeProfile } from "./model.js";
+import { EFFECTS } from "./looks.js";
 import { mountBackground } from "./effects.js";
+import { mountOverlays } from "./overlays.js";
 import { bindPlayer } from "./player.js";
 import { homeHref } from "./route.js";
 
@@ -88,13 +90,17 @@ export function mountPage(container, rawProfile, options = {}) {
   let trackSignature = "";
   let playerApi = null;
   let backgroundApi = null;
+  let overlayApi = null;
+  let typeTimer = 0;
+  let typedKey = "";
   const counted = options.countView && profile.username ? bumpViews(profile.username) : readViews(profile.username);
 
   const page = el("div", { class: `gl-page ${options.preview ? "is-preview" : "is-live"}` });
   const scene = el("div", { class: "scene", "aria-hidden": "true" });
-  const entrance = el("div", { class: "entrance" });
+  const entrance = el("div", { class: "entrance", "data-splash": "ghost" });
   const experience = el("div", { class: "experience" });
-  page.append(scene, entrance, experience);
+  const fxHost = el("div", { class: "fx-host", "aria-hidden": "true" });
+  page.append(scene, fxHost, entrance, experience);
 
   const ghost = splashGhostNode();
   const splashName = el("span", { class: "splash-name" });
@@ -109,7 +115,12 @@ export function mountPage(container, rawProfile, options = {}) {
     el("span", { class: "enter-hint" }, "or tap anywhere")
   ]);
   const splashNote = el("p", { class: "splash-note" });
-  entrance.append(el("div", { class: "splash-brand", "aria-hidden": "true" }, [svgIcon("ghost"), "GHOST", el("span", {}, "LINKS")]), enterButton, splashNote);
+  entrance.append(
+    el("div", { class: "splash-stage", "aria-hidden": "true" }),
+    el("div", { class: "splash-brand", "aria-hidden": "true" }, [svgIcon("ghost"), "GHOST", el("span", {}, "LINKS")]),
+    enterButton,
+    splashNote
+  );
 
   const motionButton = el("button", { class: "motion-button", type: "button" }, [svgIcon("motion"), el("span", {}, "Motion")]);
   const brand = el("a", { class: "wordmark", href: homeHref() }, [svgIcon("ghost"), el("span", {}, ["GHOST", el("span", {}, "LINKS")])]);
@@ -181,6 +192,39 @@ export function mountPage(container, rawProfile, options = {}) {
     }
     const views = profile.username ? (options.countView ? counted : readViews(profile.username)) : 0;
     viewCount.textContent = profile.username ? views.toLocaleString() : "–";
+    syncLook();
+  }
+
+  function syncLook() {
+    const settings = profile.settings || { splash: "ghost", effects: [] };
+    entrance.dataset.splash = settings.splash || "ghost";
+    for (const effect of EFFECTS) {
+      page.classList.toggle(`fx-${effect.id}`, settings.effects.includes(effect.id));
+    }
+    if (!overlayApi) overlayApi = mountOverlays(fxHost, page, card);
+    overlayApi.setEffects(settings.effects);
+    overlayApi.setMotion(motionOn);
+    syncTypewriter();
+  }
+
+  function syncTypewriter() {
+    const on = profile.settings?.effects?.includes("typewriter") && motionOn;
+    const full = profile.bio || "Add a short bio.";
+    const key = `${on}:${full}`;
+    if (key === typedKey) return;
+    typedKey = key;
+    window.clearInterval(typeTimer);
+    if (!on) {
+      bio.textContent = full;
+      return;
+    }
+    let index = 0;
+    bio.textContent = "";
+    typeTimer = window.setInterval(() => {
+      index += 1;
+      bio.textContent = full.slice(0, index);
+      if (index >= full.length) window.clearInterval(typeTimer);
+    }, 26);
   }
 
   function paintLinks() {
@@ -218,6 +262,8 @@ export function mountPage(container, rawProfile, options = {}) {
     motionButton.setAttribute("aria-pressed", String(!motionOn));
     motionButton.setAttribute("aria-label", motionOn ? "Pause visual motion" : "Play visual motion");
     backgroundApi?.setMotion(motionOn);
+    overlayApi?.setMotion(motionOn);
+    syncTypewriter();
   }
 
   function retireGhost() {
@@ -330,6 +376,8 @@ export function mountPage(container, rawProfile, options = {}) {
       document.removeEventListener("visibilitychange", onHide);
       playerApi?.destroy();
       backgroundApi?.stop();
+      overlayApi?.stop();
+      window.clearInterval(typeTimer);
     },
     root: page
   };
@@ -366,6 +414,7 @@ function musicShell() {
       ]),
       el("a", { class: "yt-open", href: "https://www.youtube.com", target: "_blank", rel: "noopener noreferrer" }, "YouTube")
     ]),
+    el("div", { class: "viz-bars", "aria-hidden": "true" }, [el("i"), el("i"), el("i"), el("i"), el("i"), el("i"), el("i"), el("i"), el("i"), el("i"), el("i"), el("i")]),
     el("div", { class: "yt-host", "aria-hidden": "true" }, [el("div", { class: "yt-slot" })])
   ]);
 }

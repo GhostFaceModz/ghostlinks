@@ -1,5 +1,7 @@
 /** Profile shape, validation, and the built-in demo page. Pure: no DOM. */
 
+import { normalizeSettings } from "./looks.js";
+
 export const RESERVED_USERNAMES = [
   "admin",
   "api",
@@ -216,6 +218,7 @@ export function normalizeProfile(input = {}) {
     font,
     enterScreen: input.enterScreen !== false,
     published: input.published !== false,
+    settings: normalizeSettings(input.settings),
     links,
     tracks
   };
@@ -265,6 +268,7 @@ export function demoProfile() {
     font: "unbounded",
     enterScreen: true,
     published: true,
+    settings: { splash: "portal", effects: ["fireflies", "ghosts", "glow", "rainbow", "visualiser", "aurora"] },
     links: [
       { url: "https://ghostflix.uk", label: "GhostFlix", platform: "custom" },
       { url: "https://ghostgames.app", label: "GhostGames", platform: "custom" },
@@ -292,6 +296,7 @@ export function starterProfile(seed = {}) {
     font: "unbounded",
     enterScreen: true,
     published: true,
+    settings: { splash: "ghost", effects: ["glow", "rainbow"] },
     links: [
       { url: "https://ghostflix.uk", label: "GhostFlix", platform: "custom" },
       { url: "https://ghostgames.app", label: "GhostGames", platform: "custom" },
