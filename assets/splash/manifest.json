@@ -1,0 +1,158 @@
+[
+  {
+    "id": "splash-01",
+    "file": "splash-01.webp",
+    "name": "Neon Ghost",
+    "tags": [
+      "neon",
+      "ghost",
+      "fog",
+      "cyan",
+      "violet",
+      "dark"
+    ]
+  },
+  {
+    "id": "splash-02",
+    "file": "splash-02.webp",
+    "name": "Purple Nebula",
+    "tags": [
+      "space",
+      "nebula",
+      "purple",
+      "stars",
+      "cosmic",
+      "dark"
+    ]
+  },
+  {
+    "id": "splash-03",
+    "file": "splash-03.webp",
+    "name": "Cyberpunk Rain",
+    "tags": [
+      "cyberpunk",
+      "rain",
+      "city",
+      "neon",
+      "pink",
+      "teal"
+    ]
+  },
+  {
+    "id": "splash-04",
+    "file": "splash-04.webp",
+    "name": "Glitch Void",
+    "tags": [
+      "glitch",
+      "void",
+      "chromatic",
+      "abstract",
+      "digital",
+      "dark"
+    ]
+  },
+  {
+    "id": "splash-05",
+    "file": "splash-05.webp",
+    "name": "Aurora",
+    "tags": [
+      "aurora",
+      "mountains",
+      "night",
+      "green",
+      "landscape",
+      "dark"
+    ]
+  },
+  {
+    "id": "splash-06",
+    "file": "splash-06.webp",
+    "name": "Sakura Night",
+    "tags": [
+      "japan",
+      "sakura",
+      "street",
+      "night",
+      "rain",
+      "warm"
+    ]
+  },
+  {
+    "id": "splash-07",
+    "file": "splash-07.webp",
+    "name": "Liquid Chrome",
+    "tags": [
+      "chrome",
+      "liquid",
+      "abstract",
+      "metal",
+      "studio",
+      "sleek"
+    ]
+  },
+  {
+    "id": "splash-08",
+    "file": "splash-08.webp",
+    "name": "Red Embers",
+    "tags": [
+      "embers",
+      "smoke",
+      "red",
+      "fire",
+      "warm",
+      "dark"
+    ]
+  },
+  {
+    "id": "splash-09",
+    "file": "splash-09.webp",
+    "name": "Bioluminescence",
+    "tags": [
+      "ocean",
+      "bioluminescence",
+      "blue",
+      "underwater",
+      "deep",
+      "dark"
+    ]
+  },
+  {
+    "id": "splash-10",
+    "file": "splash-10.webp",
+    "name": "Synthwave",
+    "tags": [
+      "synthwave",
+      "sunset",
+      "grid",
+      "retro",
+      "magenta",
+      "vaporwave"
+    ]
+  },
+  {
+    "id": "splash-11",
+    "file": "splash-11.webp",
+    "name": "Crystal Cave",
+    "tags": [
+      "crystal",
+      "ice",
+      "cave",
+      "frost",
+      "cyan",
+      "dark"
+    ]
+  },
+  {
+    "id": "splash-12",
+    "file": "splash-12.webp",
+    "name": "Dark Bokeh",
+    "tags": [
+      "minimal",
+      "gradient",
+      "bokeh",
+      "dark",
+      "gold",
+      "elegant"
+    ]
+  }
+]
