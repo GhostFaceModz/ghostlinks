@@ -17,8 +17,8 @@ function makeSprite(color, ratio) {
   if (!g) return null;
   g.scale(ratio, ratio);
   const grad = g.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
-  grad.addColorStop(0, "#fff");
-  grad.addColorStop(0.18, color);
+  grad.addColorStop(0, color);
+  grad.addColorStop(0.22, color);
   grad.addColorStop(0.45, hexFade(color, 0.25));
   grad.addColorStop(1, hexFade(color, 0));
   g.fillStyle = grad;
@@ -54,7 +54,8 @@ function mountCanvas(scene, kind) {
   let height = 1;
   let ratio = 1;
   let particles = [];
-  let sprite = null;
+  let violetSprite = null;
+  let cyanSprite = null;
   let running = true;
   let frame = 0;
   let last = 0;
@@ -63,7 +64,7 @@ function mountCanvas(scene, kind) {
   let visible = true;
   let shooting = [];
   let nextShot = 2000;
-  const accent = kind === "embers" ? readAccent(scene) : "#d9ccff";
+  const accent = kind === "embers" ? readAccent(scene) : "#8f6cff";
 
   function resize() {
     const rect = scene.getBoundingClientRect();
@@ -75,7 +76,9 @@ function mountCanvas(scene, kind) {
     canvas.style.width = `${width}px`;
     canvas.style.height = `${height}px`;
     ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-    sprite = makeSprite(accent, ratio);
+    violetSprite = makeSprite("#8f6cff", ratio);
+    cyanSprite = makeSprite("#36c8ff", ratio);
+    sprite = kind === "embers" ? makeSprite(accent, ratio) : violetSprite;
     const count = kind === "embers" ? (lite ? 14 : 28) : (lite ? 26 : 64);
     particles = Array.from({ length: count }, () => spawn(true));
   }
@@ -88,7 +91,8 @@ function mountCanvas(scene, kind) {
         r: Math.random() * 1.8 + 0.6,
         speed: Math.random() * 0.45 + 0.15,
         drift: Math.random() * Math.PI * 2,
-        alpha: Math.random() * 0.45 + 0.25
+        alpha: Math.random() * 0.22 + 0.08,
+        tint: Math.random() > 0.45 ? "cyan" : "violet"
       };
     }
     return {
@@ -97,7 +101,8 @@ function mountCanvas(scene, kind) {
       r: Math.random() * 1.4 + 0.3,
       speed: Math.random() * 0.18 + 0.05,
       drift: Math.random() * Math.PI * 2,
-      alpha: Math.random() * 0.55 + 0.2,
+      alpha: Math.random() * 0.2 + 0.06,
+      tint: Math.random() > 0.45 ? "cyan" : "violet",
       phase: Math.random() * Math.PI * 2
     };
   }
@@ -157,9 +162,10 @@ function mountCanvas(scene, kind) {
       }
       const twinkle = kind === "stars" ? 0.55 + 0.45 * Math.sin(particle.phase + now * 0.002) : 0.85;
       const size = 8 + particle.r * 6;
-      if (sprite) {
+      const dot = kind === "embers" ? sprite : (particle.tint === "cyan" ? cyanSprite : violetSprite);
+      if (dot) {
         ctx.globalAlpha = particle.alpha * twinkle;
-        ctx.drawImage(sprite, particle.x - size / 2, particle.y - size / 2, size, size);
+        ctx.drawImage(dot, particle.x - size / 2, particle.y - size / 2, size, size);
       }
     }
     ctx.globalAlpha = 1;
