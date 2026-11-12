@@ -88,6 +88,63 @@ export function normalizeSplashImage(value) {
 }
 
 const FRAME_ID = /^[a-z0-9][a-z0-9_-]{0,31}$/;
+const AVATAR_ID = /^[a-z0-9][a-z0-9_-]{0,40}$/;
+
+export const GHOST_MARKS = [
+  { id: "cute", label: "Cute Glow", file: "ghost-cute.png" },
+  { id: "cool", label: "Neon Cool", file: "ghost-cool.png" },
+  { id: "gold", label: "Golden Smile", file: "ghost-gold.png" },
+  { id: "hooded", label: "Hooded", file: "ghost-hooded.png" },
+  { id: "arcade", label: "Arcade", file: "ghost-arcade.png" },
+  { id: "line", label: "Line Glow", file: "ghost-line.png" }
+];
+
+export function normalizeAvatarChoice(value) {
+  const id = String(value || "").trim().toLowerCase();
+  if (!id) return "";
+  return AVATAR_ID.test(id) ? id : "";
+}
+
+export function defaultGhostId(accent) {
+  const hex = String(accent || "").trim().replace(/^#/, "");
+  if (!/^[0-9a-f]{6}$/i.test(hex)) return "cute";
+  const r = parseInt(hex.slice(0, 2), 16) / 255;
+  const g = parseInt(hex.slice(2, 4), 16) / 255;
+  const b = parseInt(hex.slice(4, 6), 16) / 255;
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const d = max - min;
+  if (!d) return "cute";
+  let hue;
+  if (max === r) hue = ((g - b) / d) % 6;
+  else if (max === g) hue = (b - r) / d + 2;
+  else hue = (r - g) / d + 4;
+  hue = (hue * 60 + 360) % 360;
+  return hue >= 150 && hue <= 210 ? "cool" : "cute";
+}
+
+export function ghostMarkPath(id) {
+  const mark = GHOST_MARKS.find((item) => item.id === id);
+  return mark ? `assets/brand/ghosts/${mark.file}` : "";
+}
+
+export function resolveAvatar(profile = {}, premium = []) {
+  const settings = profile.settings || {};
+  const choice = normalizeAvatarChoice(settings.avatar);
+  const photo = String(profile.avatarUrl || "");
+  const logo = normalizeLogoImage(settings.logo_image);
+  if ((choice === "upload" || choice === "discord") && photo) {
+    return { src: photo, photo: true, id: choice };
+  }
+  const ghost = ghostMarkPath(choice);
+  if (ghost) return { src: ghost, photo: false, id: choice };
+  const extra = premium.find((item) => item.id === choice);
+  if (extra) return { src: `assets/brand/avatars/${extra.file}`, photo: true, id: choice };
+  if (!choice && photo) return { src: photo, photo: true, id: "" };
+  if (!choice && logo) return { src: logo, photo: false, id: "" };
+  const fallback = defaultGhostId(profile.accent);
+  return { src: ghostMarkPath(fallback), photo: false, id: fallback };
+}
 const BACKDROP_MEDIA = /^data:(image\/gif|video\/webm|video\/mp4);base64,[a-z0-9+/=]+$/i;
 
 export const BACKDROPS = [
@@ -153,6 +210,7 @@ export function normalizeSettings(input = {}) {
     splash_image: normalizeSplashImage(input.splash_image),
     logo_image: normalizeLogoImage(input.logo_image),
     avatar_frame: normalizeAvatarFrame(input.avatar_frame),
+    avatar: normalizeAvatarChoice(input.avatar),
     background,
     background_media
   };

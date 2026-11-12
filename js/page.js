@@ -1,15 +1,14 @@
 import { el } from "./dom.js";
 import { svgIcon } from "./icons.js";
 import { FONTS, THEMES, normalizeProfile, profileBadges } from "./model.js";
-import { EFFECTS, activeBackdrop } from "./looks.js";
+import { EFFECTS, activeBackdrop, resolveAvatar } from "./looks.js";
+import { loadPremiumAvatars } from "./avatar-picker.js";
 import { mountBackdrop } from "./backdrops.js";
 import { frameSrc, loadFrameManifest } from "./frames.js";
 import { mountOverlays } from "./overlays.js";
 import { bindPlayer } from "./player.js";
 import { homeHref, siteBase } from "./route.js";
 import { recordView } from "./store.js";
-
-const NS = "http://www.w3.org/2000/svg";
 
 function setInert(node, on) {
   if (on) node.setAttribute("inert", "");
@@ -36,37 +35,29 @@ function motionAllowed() {
   try { return localStorage.getItem("ghostlinks.motion") !== "off"; } catch { return true; }
 }
 
-function splashGhostNode() {
-  const wrap = el("span", { class: "splash-ghost" });
-  wrap.append(el("span", { class: "halo", "aria-hidden": "true" }));
-  wrap.append(el("span", { class: "ring", "aria-hidden": "true" }));
-  wrap.append(el("span", { class: "ring ring-two", "aria-hidden": "true" }));
-  const svg = document.createElementNS(NS, "svg");
-  svg.setAttribute("viewBox", "0 0 200 200");
-  svg.setAttribute("class", "ghost-svg");
-  svg.setAttribute("aria-hidden", "true");
-  const body = document.createElementNS(NS, "path");
-  body.setAttribute("fill", "currentColor");
-  body.setAttribute("d", "M100 18c-40 0-70 30-70 72v78c0 4 5 6 8 3l14-12 12 14c3 4 9 4 12 0l12-14 12 14c3 4 9 4 12 0l12-14 12 14c3 4 9 4 12 0l12-14 14 12c3 3 8 1 8-3V90c0-42-30-72-70-72z");
-  const left = document.createElementNS(NS, "circle");
-  left.setAttribute("cx", "78");
-  left.setAttribute("cy", "96");
-  left.setAttribute("r", "8");
-  left.setAttribute("fill", "#160f2e");
-  const right = document.createElementNS(NS, "circle");
-  right.setAttribute("cx", "122");
-  right.setAttribute("cy", "96");
-  right.setAttribute("r", "8");
-  right.setAttribute("fill", "#160f2e");
-  const smile = document.createElementNS(NS, "path");
-  smile.setAttribute("d", "M86 120c8 10 20 10 28 0");
-  smile.setAttribute("fill", "none");
-  smile.setAttribute("stroke", "#160f2e");
-  smile.setAttribute("stroke-width", "5");
-  smile.setAttribute("stroke-linecap", "round");
-  svg.append(body, left, right, smile);
-  wrap.append(svg, el("img", { class: "logo-img", alt: "", hidden: true }));
-  return wrap;
+function absAsset(src) {
+  if (!src) return "";
+  if (src.startsWith("data:") || src.startsWith("https://") || src.startsWith("http://")) return src;
+  return `${siteBase()}${src}`;
+}
+
+function avatarStage(className) {
+  const img = el("img", { alt: "" });
+  return el("span", { class: className }, [
+    el("span", { class: "avatar-glow", "aria-hidden": "true" }),
+    el("span", { class: "avatar-ring", "aria-hidden": "true" }),
+    el("span", { class: "avatar-glass", "aria-hidden": "true" }),
+    img
+  ]);
+}
+
+function paintStage(stage, portrait, alt) {
+  const img = stage.querySelector("img");
+  const src = absAsset(portrait.src);
+  if (img.getAttribute("src") !== src) img.src = src;
+  img.alt = alt || "";
+  img.className = portrait.photo ? "avatar-photo" : "avatar-mark";
+  stage.classList.toggle("is-photo", Boolean(portrait.photo));
 }
 
 function logoUrl(value) {
@@ -100,6 +91,7 @@ export function mountPage(container, rawProfile, options = {}) {
   let overlayApi = null;
   let typeTimer = 0;
   let typedKey = "";
+  let premiumAvatars = [];
   const counted = profile.username ? readViews(profile.username) : 0;
 
   const page = el("div", {
@@ -112,7 +104,7 @@ export function mountPage(container, rawProfile, options = {}) {
   const fxHost = el("div", { class: "fx-host", "aria-hidden": "true" });
   page.append(scene, fxHost, entrance, experience);
 
-  const ghost = splashGhostNode();
+  const ghost = avatarStage("splash-ghost avatar-stage");
   const splashName = el("span", { class: "splash-name" });
   const splashHandle = el("span", { class: "splash-handle" });
   const enterButton = el("button", { class: "enter-button", type: "button" }, [
@@ -138,10 +130,8 @@ export function mountPage(container, rawProfile, options = {}) {
   if (options.preview) brand.addEventListener("click", (event) => event.preventDefault());
   const topbar = el("header", { class: "topbar" }, [brand, el("div", { class: "top-actions" }, [soundButton, motionButton])]);
 
-  const banner = el("div", { class: "banner", "aria-hidden": "true" }, [el("span", { class: "banner-ghost" }, [svgIcon("ghost")]), el("span", { class: "banner-fade" })]);
-  const avatarImg = el("img", { class: "avatar", alt: "", width: "128", height: "128" });
-  const avatarFallback = el("span", { class: "avatar-fallback", "aria-hidden": "true" }, [svgIcon("ghost")]);
-  const avatarWrap = el("div", { class: "avatar-wrap" }, [el("span", { class: "avatar-ring", "aria-hidden": "true" }), avatarImg, avatarFallback]);
+  const banner = el("div", { class: "banner", "aria-hidden": "true" }, [el("span", { class: "banner-fade" })]);
+  const avatarWrap = avatarStage("avatar-wrap avatar-stage");
   const cardLogo = el("img", { class: "card-logo", alt: "", hidden: true });
   const frameImg = el("img", { class: "avatar-frame", alt: "", hidden: true });
   avatarWrap.append(frameImg);
@@ -199,31 +189,17 @@ export function mountPage(container, rawProfile, options = {}) {
       if (!playerApi && profile.tracks.length) playerApi = bindPlayer(music, profile.tracks);
       else playerApi?.setTracks(profile.tracks);
     }
-    const mark = logoUrl(profile.settings?.logo_image || "");
-    const logoImg = ghost.querySelector(".logo-img");
-    ghost.classList.toggle("has-logo", Boolean(mark));
     entrance.classList.toggle("has-photo", Boolean(profile.settings?.splash_image));
-    if (logoImg) {
-      if (mark) logoImg.src = mark;
-      else logoImg.removeAttribute("src");
-      logoImg.hidden = !mark;
-    }
-    cardLogo.hidden = !mark;
-    if (mark) {
+    const portrait = resolveAvatar(profile, premiumAvatars);
+    paintStage(ghost, portrait, "");
+    paintStage(avatarWrap, portrait, portrait.photo ? `${shown}'s avatar` : "");
+    const mark = logoUrl(profile.settings?.logo_image || "");
+    const portraitSrc = absAsset(portrait.src);
+    cardLogo.hidden = !mark || mark === portraitSrc;
+    if (mark && mark !== portraitSrc) {
       cardLogo.src = mark;
       cardLogo.alt = "";
     } else cardLogo.removeAttribute("src");
-    if (profile.avatarUrl) {
-      avatarImg.src = profile.avatarUrl;
-      avatarImg.alt = `${shown}'s avatar`;
-      avatarImg.hidden = false;
-      avatarFallback.hidden = true;
-    } else {
-      avatarImg.removeAttribute("src");
-      avatarImg.alt = "";
-      avatarImg.hidden = true;
-      avatarFallback.hidden = false;
-    }
     const views = profile.username ? (options.countView ? counted : readViews(profile.username)) : 0;
     viewCount.textContent = profile.username ? views.toLocaleString() : "–";
     viewWords.textContent = views === 1 ? " visit" : " visits";
@@ -254,9 +230,8 @@ export function mountPage(container, rawProfile, options = {}) {
       return;
     }
     presence.hidden = false;
-    const face = profile.avatarUrl
-      ? el("img", { class: "presence-avatar", alt: "", src: profile.avatarUrl, width: "40", height: "40" })
-      : el("span", { class: "presence-avatar presence-fallback", "aria-hidden": "true" }, [svgIcon("ghost")]);
+    const faceSrc = absAsset(resolveAvatar(profile, premiumAvatars).src);
+    const face = el("img", { class: "presence-avatar", alt: "", src: faceSrc, width: "40", height: "40" });
     presence.replaceChildren(
       el("span", { class: "presence-face" }, [face, el("span", { class: "online-dot", "aria-hidden": "true" })]),
       el("span", { class: "presence-name" }, nameText)
@@ -444,6 +419,10 @@ export function mountPage(container, rawProfile, options = {}) {
   applyLook(page, profile);
   syncBackground();
   paintCopy();
+  loadPremiumAvatars().then((list) => {
+    premiumAvatars = list;
+    paintCopy();
+  });
   setMotion(motionOn);
   if (options.countView && profile.username) {
     recordView(profile.username).then((count) => {

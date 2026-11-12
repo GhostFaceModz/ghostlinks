@@ -8,13 +8,13 @@ import {
   parseYouTubeId,
   platformFromUrl,
   platformLabel,
-  profileIssues,
-  safeAvatar
+  profileIssues
 } from "./model.js";
 import { MAX_EFFECTS, TEMPLATES, activeBackdrop, normalizeSettings } from "./looks.js";
 import { mountFramePicker } from "./frames.js";
 import { mountEffectCards, mountSplashCards, toggleEffect } from "./market.js";
 import { mountLogoPicker } from "./logo-picker.js";
+import { mountAvatarPicker } from "./avatar-picker.js";
 import { mountBackdropCards, readBackdropFile } from "./backdrops.js";
 import { mountSplashGallery } from "./splash-gallery.js";
 import { mountPage } from "./page.js";
@@ -128,7 +128,21 @@ function renderEditor(app, profile, persistedUsername, session, demo) {
   bio.value = profile.bio || "";
   const bioCount = el("span", { class: "ed-count" }, `${bio.value.length}/${LIMITS.bio}`);
   const avatarUrl = el("input", { id: "avatar-url", class: "ed-input", type: "url", placeholder: "https://…", value: profile.avatarUrl?.startsWith("data:") ? "" : (profile.avatarUrl || "") });
-  const avatarFile = el("input", { id: "avatar-file", class: "ed-file", type: "file", accept: "image/png,image/jpeg,image/webp,image/gif" });
+  const avatarPicker = el("div", { class: "avatar-picker-host" });
+  let avatarApi = null;
+  avatarApi = mountAvatarPicker(avatarPicker, profile, session, (next) => {
+    if (next.error) {
+      status.textContent = next.error;
+      return;
+    }
+    profile.settings.avatar = next.avatar;
+    if (Object.prototype.hasOwnProperty.call(next, "avatarUrl")) {
+      profile.avatarUrl = next.avatarUrl;
+      avatarUrl.value = String(next.avatarUrl || "").startsWith("data:") ? "" : (next.avatarUrl || "");
+    }
+    status.textContent = next.avatar === "upload" ? "Image added. Save to keep it." : "";
+    refresh();
+  });
   const accent = el("input", { id: "accent", type: "color", value: normalizeAccent(profile.accent), "aria-label": "Accent colour" });
   const accentText = el("input", { id: "accent-hex", class: "ed-input ed-hex", value: normalizeAccent(profile.accent), maxlength: "7", "aria-label": "Accent hex" });
 
@@ -201,6 +215,7 @@ function renderEditor(app, profile, persistedUsername, session, demo) {
     viewLink.textContent = named ? `View /${named}` : "View the demo";
     copyButton.disabled = !named;
     shareButton.disabled = !named;
+    avatarApi?.sync(profile);
     remember();
   }
 
@@ -252,32 +267,8 @@ function renderEditor(app, profile, persistedUsername, session, demo) {
   });
   avatarUrl.addEventListener("input", () => {
     profile.avatarUrl = avatarUrl.value.trim();
+    profile.settings.avatar = profile.avatarUrl ? "upload" : (profile.settings.avatar === "upload" ? "" : profile.settings.avatar);
     refresh();
-  });
-  avatarFile.addEventListener("change", () => {
-    const file = avatarFile.files && avatarFile.files[0];
-    if (!file) return;
-    if (!/^image\/(png|jpeg|webp|gif)$/.test(file.type)) {
-      status.textContent = "Use a PNG, JPEG, WebP, or GIF.";
-      return;
-    }
-    if (file.size > 260000) {
-      status.textContent = "That image is over 250 KB. Paste an https link instead.";
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = () => {
-      const value = safeAvatar(String(reader.result || ""));
-      if (!value) {
-        status.textContent = "Couldn't read that image.";
-        return;
-      }
-      profile.avatarUrl = value;
-      avatarUrl.value = "";
-      status.textContent = "Image added. Save to keep it.";
-      refresh();
-    };
-    reader.readAsDataURL(file);
   });
 
   function setAccent(value) {
@@ -610,9 +601,10 @@ function renderEditor(app, profile, persistedUsername, session, demo) {
       field("display-name", "Display name", displayName),
       field("bio", "Bio", bio),
       el("p", { class: "ed-hint ed-right" }, [bioCount]),
-      field("avatar-url", "Avatar URL", avatarUrl),
-      el("label", { class: "ed-file-label", for: "avatar-file" }, "Or choose a small image"),
-      avatarFile
+      el("p", { class: "ed-label" }, "Avatar"),
+      el("p", { class: "ed-hint" }, "Cute Glow or Neon Cool follows your accent. Pick a ghost mark, a premium portrait, or your own image."),
+      avatarPicker,
+      field("avatar-url", "Or paste an image link", avatarUrl)
     ]),
     el("fieldset", {}, [
       el("legend", {}, `Links · up to ${LIMITS.links}`),
