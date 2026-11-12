@@ -687,17 +687,6 @@ function renderEditor(app, profile, persistedUsername, session, demo) {
     window.location.href = editorHref();
   });
 
-  const header = el("header", { class: "ed-header" }, [
-    el("a", { class: "wordmark", href: homeHref() }, [svgIcon("ghost"), el("span", {}, ["GHOST", el("span", {}, "LINKS")])]),
-    el("div", { class: "ed-header-actions" }, [
-      undoButton,
-      redoButton,
-      el("a", { class: "ed-text", href: "#preview" }, "Skip to preview"),
-      demo ? reset : null,
-      session ? signOutButton : null
-    ])
-  ]);
-
   const previewColumn = el("aside", { class: "ed-preview", id: "preview", "aria-label": "Live preview" }, [
     el("div", { class: "ed-preview-bar" }, [el("h2", {}, "Preview"), replay]),
     previewHost
@@ -710,13 +699,24 @@ function renderEditor(app, profile, persistedUsername, session, demo) {
     previewToggle.textContent = open ? "Close preview" : "Preview";
   });
 
+  const header = el("header", { class: "ed-header" }, [
+    el("a", { class: "wordmark", href: homeHref() }, [svgIcon("ghost"), el("span", {}, ["GHOST", el("span", {}, "LINKS")])]),
+    el("div", { class: "ed-header-actions" }, [
+      previewToggle,
+      undoButton,
+      redoButton,
+      el("a", { class: "ed-text", href: "#preview" }, "Skip to preview"),
+      demo ? reset : null,
+      session ? signOutButton : null
+    ])
+  ]);
+
   app.replaceChildren(el("div", { class: "ed-shell", id: "editor-shell" }, [
     header,
     el("div", { class: "ed-layout" }, [
       el("div", { class: "ed-main" }, [form]),
       previewColumn
-    ]),
-    previewToggle
+    ])
   ]));
 
   renderLinks();
