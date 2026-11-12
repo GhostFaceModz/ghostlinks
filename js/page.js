@@ -81,7 +81,7 @@ function applyLook(page, profile) {
 export function mountPage(container, rawProfile, options = {}) {
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
   let profile = normalizeProfile(rawProfile);
-  let entered = !profile.enterScreen;
+  let entered = options.preview || !profile.enterScreen;
   let motionOn = motionAllowed();
   let backgroundName = "";
   let linkSignature = "";

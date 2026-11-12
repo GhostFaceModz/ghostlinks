@@ -4,7 +4,6 @@ import { el } from "./dom.js";
 import { safeAvatar } from "./model.js";
 import {
   GHOST_MARKS,
-  defaultGhostId,
   ghostMarkPath,
   normalizeAvatarChoice,
   resolveAvatar
@@ -160,12 +159,9 @@ export function mountAvatarPicker(container, profile, session, onChange) {
       avatarUrl: "",
       settings: { avatar: "", logo_image: profile.settings?.logo_image }
     }, premium);
-    const label = preview.src === ghostMarkPath(defaultGhostId(profile.accent))
-      ? (defaultGhostId(profile.accent) === "cool" ? "Neon Cool" : "Cute Glow")
-      : "Your logo";
     accentBtn.replaceChildren(
       stage(preview.src, preview.photo),
-      el("span", { class: "avatar-choice-label" }, label)
+      el("span", { class: "avatar-choice-label" }, "Default")
     );
   }
 
