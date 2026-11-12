@@ -1,7 +1,7 @@
 import { el } from "./dom.js";
 import { BACKGROUNDS, THEMES } from "./model.js";
 import { mountPage } from "./page.js";
-import { editorHref, homeHref } from "./route.js";
+import { editorHref, homeHref, siteBase } from "./route.js";
 import { loadPublic } from "./store.js";
 
 function setMeta(attr, key, content) {
@@ -37,6 +37,10 @@ export async function mountPublic(container, username, query = {}) {
     setMeta("property", "og:url", window.location.href);
     setMeta("name", "twitter:title", title);
     setMeta("name", "twitter:description", description);
+    const image = new URL(`${siteBase()}assets/brand/og.webp`, window.location.origin).href;
+    setMeta("property", "og:image", image);
+    setMeta("name", "twitter:image", image);
+    setMeta("name", "twitter:card", "summary_large_image");
     mountPage(container, profile, { countView: true });
   } catch (error) {
     document.title = "GhostLinks";

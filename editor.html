@@ -6,18 +6,37 @@
   <meta name="theme-color" content="#8f6cff">
   <meta name="description" content="Build your GhostLinks page. No code.">
   <meta name="robots" content="noindex">
+  <meta property="og:title" content="Editor · GhostLinks">
+  <meta property="og:description" content="Build your GhostLinks page. No code.">
+  <meta property="og:image" content="https://ghostfacemodz.github.io/ghostlinks/assets/brand/og.webp">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Editor · GhostLinks">
+  <meta name="twitter:description" content="Build your GhostLinks page. No code.">
+  <meta name="twitter:image" content="https://ghostfacemodz.github.io/ghostlinks/assets/brand/og.webp">
   <title>Editor · GhostLinks</title>
+  <link rel="icon" href="assets/brand/favicon-32.png" sizes="32x32" type="image/png">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/brand/icon-192.png">
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="preload" href="fonts/unbounded-700.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="css/site.css">
   <link rel="stylesheet" href="css/profile.css">
   <link rel="stylesheet" href="css/looks.css">
-  <script src="config.js"></script>
+  <script src="config.js" defer></script>
   <script type="module" src="js/boot.js"></script>
 </head>
 <body data-route="editor">
-  <a class="skip" href="#editor-form">Skip to the form</a>
+  <a class="skip" href="#editor-signin">Skip to sign in</a>
   <div id="app">
-    <p class="boot-note">Loading the editor…</p>
+    <main id="editor-signin" class="notice-card editor-gate">
+      <p class="eyebrow">GhostLinks</p>
+      <h1>Sign in to build your page</h1>
+      <p>Discord is only used so the page belongs to you. Everyone can still read a published page. No ads, no trackers.</p>
+      <button id="discord-signin" class="land-button" type="button">Sign in with Discord</button>
+      <a class="land-button land-button-quiet" href="./?u=demo">View the demo</a>
+      <p id="editor-status" class="ed-status" role="status"></p>
+    </main>
   </div>
   <noscript><p class="boot-note">The editor needs JavaScript.</p></noscript>
 </body>

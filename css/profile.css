@@ -62,6 +62,7 @@
 .gl-page .entrance.leaving .splash-brand,
 .gl-page .entrance.leaving .splash-note { opacity: 0; transform: translateY(10px); transition: opacity .45s, transform .45s; }
 .gl-page .splash-ghost.flown { animation: none !important; opacity: 0 !important; visibility: hidden !important; }
+.gl-page .splash-ghost.restart { animation: none !important; }
 .gl-page .entrance.dismissed { opacity: 0; visibility: hidden; pointer-events: none; }
 .gl-page .entrance.dismissed *:not(.splash-ghost) { animation: none !important; }
 

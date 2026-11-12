@@ -95,7 +95,10 @@ export function mountPage(container, rawProfile, options = {}) {
   let typedKey = "";
   const counted = options.countView && profile.username ? bumpViews(profile.username) : readViews(profile.username);
 
-  const page = el("div", { class: `gl-page ${options.preview ? "is-preview" : "is-live"}` });
+  const page = el("div", {
+    class: `gl-page ${options.preview ? "is-preview" : "is-live"}`,
+    id: options.preview ? null : "content"
+  });
   const scene = el("div", { class: "scene", "aria-hidden": "true" });
   const entrance = el("div", { class: "entrance", "data-splash": "ghost" });
   const experience = el("div", { class: "experience" });
@@ -161,7 +164,7 @@ export function mountPage(container, rawProfile, options = {}) {
     splashName.textContent = shown;
     splashName.dataset.text = shown;
     splashHandle.textContent = `@${at}`;
-    enterButton.setAttribute("aria-label", `Enter ${shown}'s page`);
+    enterButton.setAttribute("aria-label", `Click to enter ${shown}'s page`);
     splashNote.textContent = profile.tracks.length ? "Sound starts when you enter" : "A quiet page, until you add a song";
     name.textContent = shown;
     name.dataset.text = shown;
@@ -198,6 +201,12 @@ export function mountPage(container, rawProfile, options = {}) {
   function syncLook() {
     const settings = profile.settings || { splash: "ghost", effects: [] };
     entrance.dataset.splash = settings.splash || "ghost";
+    const stage = entrance.querySelector(".splash-stage");
+    const image = settings.splash_image || "";
+    if (stage) {
+      stage.classList.toggle("has-image", Boolean(image));
+      stage.style.backgroundImage = image ? `url("${image.replace(/"/g, "")}")` : "";
+    }
     for (const effect of EFFECTS) {
       page.classList.toggle(`fx-${effect.id}`, settings.effects.includes(effect.id));
     }
@@ -278,11 +287,11 @@ export function mountPage(container, rawProfile, options = {}) {
     page.classList.add("is-in");
     setInert(experience, false);
     entrance.setAttribute("aria-hidden", "true");
-    if (profile.tracks.length) playerApi?.play();
     const wait = immediate || !motionOn ? 0 : 1600;
     window.setTimeout(() => {
       retireGhost();
       entrance.classList.add("dismissed");
+      if (profile.tracks.length) playerApi?.activate();
     }, wait);
     if (!options.preview) motionButton.focus({ preventScroll: true });
   }
@@ -312,9 +321,10 @@ export function mountPage(container, rawProfile, options = {}) {
     entrance.removeAttribute("aria-hidden");
     ghost.classList.remove("flown");
     setInert(experience, true);
-    ghost.style.animation = "none";
-    void ghost.offsetWidth;
-    ghost.style.animation = "";
+    ghost.classList.add("restart");
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => ghost.classList.remove("restart"));
+    });
   }
 
   enterButton.addEventListener("click", (event) => {

@@ -41,6 +41,17 @@ export const MAX_EFFECTS = 10;
 const SPLASH_IDS = new Set(SPLASHES.map((item) => item.id));
 const EFFECT_IDS = new Set(EFFECTS.map((item) => item.id));
 
+const PRESET_IMAGE = /^assets\/splash\/splash-(0[1-9]|1[0-9]|20)\.webp$/;
+const DATA_IMAGE = /^data:image\/(png|jpeg|webp|gif);base64,[a-z0-9+/=]+$/i;
+
+export function normalizeSplashImage(value) {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+  if (PRESET_IMAGE.test(raw)) return raw;
+  if (DATA_IMAGE.test(raw) && raw.length <= 180000) return raw;
+  return "";
+}
+
 export function normalizeSettings(input = {}) {
   const splash = SPLASH_IDS.has(input.splash) ? input.splash : "ghost";
   const effects = [];
@@ -50,5 +61,5 @@ export function normalizeSettings(input = {}) {
     effects.push(id);
     if (effects.length >= MAX_EFFECTS) break;
   }
-  return { splash, effects };
+  return { splash, effects, splash_image: normalizeSplashImage(input.splash_image) };
 }

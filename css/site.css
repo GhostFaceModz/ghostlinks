@@ -35,6 +35,17 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 body.mode-public { background: #07060f; }
+body.mode-public .land-hero-art, body.mode-public .land-mesh, body.mode-editor .land-hero-art, body.mode-editor .land-mesh { display: none; }
+.land-hero-art {
+  position: fixed; inset: 0; z-index: -2; pointer-events: none;
+  background: url("../assets/brand/hero.webp") center / cover no-repeat;
+  opacity: .72;
+}
+.land-mesh { position: fixed; inset: -12vh; z-index: -1; pointer-events: none; overflow: hidden; }
+.land-mesh span { position: absolute; border-radius: 50%; filter: blur(46px); opacity: .42; }
+.land-mesh .m1 { width: 50vmax; height: 50vmax; left: -10%; top: -16%; background: #8f6cff; animation: mesh-drift 24s ease-in-out infinite alternate; }
+.land-mesh .m2 { width: 38vmax; height: 38vmax; right: -8%; top: 6%; background: #36c8ff; animation: mesh-drift 30s ease-in-out infinite alternate-reverse; }
+.land-mesh .m3 { width: 34vmax; height: 34vmax; left: 28%; bottom: -12%; background: #ff6ad5; opacity: .28; animation: mesh-drift 26s ease-in-out infinite alternate; }
 a { color: inherit; }
 button, input, textarea { font: inherit; color: inherit; }
 button { cursor: pointer; }
@@ -113,6 +124,8 @@ button { cursor: pointer; }
 .notice-card, .ed-gate {
   max-width: 520px; margin: 10vh auto; padding: 28px 20px; text-align: left;
 }
+.editor-gate { min-height: 28rem; }
+body[data-route="editor"] #app { min-height: 70vh; }
 .boot-note { padding: 24px 16px; color: var(--muted); }
 
 .ed-shell { max-width: 1180px; margin: 0 auto; padding: 8px 14px 32px; }
@@ -139,6 +152,12 @@ textarea.ed-input { min-height: 96px; resize: vertical; }
 .ed-status { min-height: 1.4em; color: #ddd6ff; }
 .choice-row { display: flex; flex-wrap: wrap; gap: 8px; }
 .splash-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.splash-presets { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.splash-preset { position: relative; min-height: 72px; border-radius: 14px; overflow: hidden; border: 1px solid rgba(255,255,255,.14); background: #120c22; color: #fff; }
+.splash-preset img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.preset-fallback { position: absolute; inset: 0; background: radial-gradient(circle at 30% 20%, #8f6cff88, transparent 55%), linear-gradient(160deg, #24183f, #090712); }
+.splash-preset span:last-child { position: relative; z-index: 1; font-size: 11px; padding: 8px; display: block; text-shadow: 0 1px 6px #000; }
+.splash-preset[aria-selected="true"] { outline: 2px solid #d9ccff; outline-offset: 2px; }
 .splash-pick { display: grid; gap: 6px; justify-items: stretch; text-align: center; border-radius: 16px; padding: 8px; min-height: 96px; }
 .splash-mini { position: relative; height: 52px; border-radius: 10px; overflow: hidden; background: #100c1c; display: grid; place-items: center; }
 .splash-mini i { font-family: "Unbounded", sans-serif; font-style: normal; font-size: 14px; position: relative; z-index: 1; }
@@ -188,4 +207,6 @@ textarea.ed-input { min-height: 96px; resize: vertical; }
 @media (prefers-reduced-motion: reduce) {
   * { scroll-behavior: auto !important; }
   .switch-ui::after { transition: none; }
+  .land-mesh span { animation: none !important; }
 }
+@keyframes mesh-drift { from { transform: translate3d(0, 0, 0) scale(1); } to { transform: translate3d(4vw, 3vh, 0) scale(1.08); } }

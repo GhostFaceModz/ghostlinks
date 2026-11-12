@@ -43,15 +43,20 @@ export function mountOverlays(host, page, card) {
 
   function resize() {
     const rect = host.getBoundingClientRect();
-    width = Math.max(1, rect.width || window.innerWidth);
-    height = Math.max(1, rect.height || window.innerHeight);
-    ratio = Math.min(window.devicePixelRatio || 1, isLite() ? 1.25 : 2);
-    canvas.width = Math.round(width * ratio);
-    canvas.height = Math.round(height * ratio);
-    canvas.style.width = `${width}px`;
-    canvas.style.height = `${height}px`;
-    if (ctx) ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-    rebuild();
+    const nextWidth = Math.max(1, rect.width || window.innerWidth);
+    const nextHeight = Math.max(1, rect.height || window.innerHeight);
+    const nextRatio = Math.min(window.devicePixelRatio || 1, isLite() ? 1.25 : 2);
+    requestAnimationFrame(() => {
+      width = nextWidth;
+      height = nextHeight;
+      ratio = nextRatio;
+      canvas.width = Math.round(width * ratio);
+      canvas.height = Math.round(height * ratio);
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      if (ctx) ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+      rebuild();
+    });
   }
 
   function rebuild() {
@@ -121,32 +126,44 @@ export function mountOverlays(host, page, card) {
     ctx.globalAlpha = 1;
   }
 
+  let moveFrame = 0;
+  let pendingMove = null;
   function onMove(event) {
     if (!motion || !isFine()) return;
-    const wantTrail = effects.includes("trail");
-    const wantSpark = effects.includes("sparkle");
-    if ((wantTrail || wantSpark) && sparks.length < 80) {
-      sparks.push({
-        x: event.clientX,
-        y: event.clientY,
-        life: 1,
-        size: wantSpark ? 3 : 2,
-        color: wantSpark ? "#fff6c2" : "#d9ccff"
-      });
-    }
-    if (effects.includes("tilt") && card) {
-      const rect = card.getBoundingClientRect();
-      const x = (event.clientX - rect.left) / rect.width - 0.5;
-      const y = (event.clientY - rect.top) / rect.height - 0.5;
-      card.style.setProperty("--tilt-x", `${(-y * 6).toFixed(2)}deg`);
-      card.style.setProperty("--tilt-y", `${(x * 8).toFixed(2)}deg`);
-    }
-    if (effects.includes("parallax")) {
-      const x = (event.clientX / window.innerWidth - 0.5) * 16;
-      const y = (event.clientY / window.innerHeight - 0.5) * 10;
-      page.style.setProperty("--parallax-x", `${x.toFixed(1)}px`);
-      page.style.setProperty("--parallax-y", `${y.toFixed(1)}px`);
-    }
+    pendingMove = { x: event.clientX, y: event.clientY };
+    if (moveFrame) return;
+    moveFrame = requestAnimationFrame(() => {
+      moveFrame = 0;
+      const point = pendingMove;
+      pendingMove = null;
+      if (!point) return;
+      const cardBox = effects.includes("tilt") && card ? card.getBoundingClientRect() : null;
+      const viewWidth = window.innerWidth;
+      const viewHeight = window.innerHeight;
+      const wantTrail = effects.includes("trail");
+      const wantSpark = effects.includes("sparkle");
+      if ((wantTrail || wantSpark) && sparks.length < 80) {
+        sparks.push({
+          x: point.x,
+          y: point.y,
+          life: 1,
+          size: wantSpark ? 3 : 2,
+          color: wantSpark ? "#fff6c2" : "#d9ccff"
+        });
+      }
+      if (cardBox && cardBox.width) {
+        const x = (point.x - cardBox.left) / cardBox.width - 0.5;
+        const y = (point.y - cardBox.top) / cardBox.height - 0.5;
+        card.style.setProperty("--tilt-x", `${(-y * 6).toFixed(2)}deg`);
+        card.style.setProperty("--tilt-y", `${(x * 8).toFixed(2)}deg`);
+      }
+      if (effects.includes("parallax") && viewWidth && viewHeight) {
+        const x = (point.x / viewWidth - 0.5) * 16;
+        const y = (point.y / viewHeight - 0.5) * 10;
+        page.style.setProperty("--parallax-x", `${x.toFixed(1)}px`);
+        page.style.setProperty("--parallax-y", `${y.toFixed(1)}px`);
+      }
+    });
   }
 
   function onLeave() {

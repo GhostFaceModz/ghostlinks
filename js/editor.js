@@ -13,6 +13,7 @@ import {
 } from "./model.js";
 import { MAX_EFFECTS, normalizeSettings } from "./looks.js";
 import { mountEffectCards, mountSplashCards, toggleEffect } from "./market.js";
+import { mountSplashGallery } from "./splash-gallery.js";
 import { mountPage } from "./page.js";
 import { editorHref, homeHref, publicHref } from "./route.js";
 import {
@@ -28,19 +29,20 @@ import {
 
 export async function mountEditor(app) {
   document.body.classList.add("mode-editor");
-  app.replaceChildren(el("p", { class: "boot-note" }, "Loading the editor…"));
   try {
     const demo = isDemoMode();
     const session = demo ? null : await currentSession();
     if (!demo && !session) {
-      app.replaceChildren(gate(new URLSearchParams(location.search).get("error_description")));
+      wireSignIn(new URLSearchParams(location.search).get("error_description"));
       return;
     }
     const loaded = await loadOwn(session);
-  loaded.profile.settings = normalizeSettings(loaded.profile.settings);
+    loaded.profile.settings = normalizeSettings(loaded.profile.settings);
     renderEditor(app, loaded.profile, loaded.persistedUsername, session, demo);
+    const skip = document.querySelector("a.skip");
+    if (skip) skip.setAttribute("href", "#editor-shell");
   } catch (error) {
-    app.replaceChildren(el("div", { class: "notice-card" }, [
+    app.replaceChildren(el("main", { id: "editor-signin", class: "notice-card editor-gate" }, [
       el("h1", {}, "The editor couldn't open"),
       el("p", {}, error.message || "Try again in a moment."),
       el("a", { class: "land-button", href: homeHref() }, "Back home")
@@ -48,28 +50,24 @@ export async function mountEditor(app) {
   }
 }
 
-function gate(oauthError) {
-  const status = el("p", { class: "ed-status", role: "status" });
-  if (oauthError) status.textContent = oauthError;
-  const button = el("button", { class: "land-button", type: "button" }, "Sign in with Discord");
+function wireSignIn(oauthError) {
+  const card = document.getElementById("editor-signin");
+  const status = document.getElementById("editor-status");
+  const button = document.getElementById("discord-signin");
+  if (status && oauthError) status.textContent = oauthError;
+  if (!button || button.dataset.wired === "true") return;
+  button.dataset.wired = "true";
   button.addEventListener("click", async () => {
     button.disabled = true;
-    status.textContent = "Redirecting to Discord…";
+    if (status) status.textContent = "Redirecting to Discord…";
     try {
       await signInWithDiscord();
     } catch (error) {
       button.disabled = false;
-      status.textContent = error.message || "Discord sign-in didn't start.";
+      if (status) status.textContent = error.message || "Discord sign-in didn't start.";
     }
   });
-  return el("div", { class: "notice-card" }, [
-    el("a", { class: "wordmark", href: homeHref() }, [svgIcon("ghost"), "GhostLinks"]),
-    el("h1", {}, "Sign in to build your page"),
-    el("p", {}, "Discord is only used so the page belongs to you. Everyone can still read a published page. No ads, no trackers."),
-    button,
-    el("a", { class: "land-button land-button-quiet", href: `${homeHref()}?u=demo` }, "View the demo"),
-    status
-  ]);
+  if (!card) return;
 }
 
 function renderEditor(app, profile, persistedUsername, session, demo) {
@@ -234,6 +232,12 @@ function renderEditor(app, profile, persistedUsername, session, demo) {
     pageApi?.replay();
   });
 
+  const gallery = el("div", { class: "splash-gallery" });
+  mountSplashGallery(gallery, profile, (value) => {
+    profile.settings.splash_image = value;
+    refresh();
+  }, (message) => { status.textContent = message; });
+
   const effectRow = el("div", { role: "group", "aria-label": "Page effects" });
   mountEffectCards(effectRow, profile, (id) => {
     const result = toggleEffect(profile, id, () => {
@@ -387,6 +391,9 @@ function renderEditor(app, profile, persistedUsername, session, demo) {
       bgRow,
       el("p", { class: "ed-label" }, "Click-to-enter style"),
       splashRow,
+      el("p", { class: "ed-label" }, "Entrance image"),
+      el("p", { class: "ed-hint" }, "A preset from the gallery, or your own image. Missing files stay as quiet placeholders."),
+      gallery,
       el("p", { class: "ed-label" }, "Page effects"),
       el("p", { class: "ed-hint" }, `Turn on up to ${MAX_EFFECTS}. They stack, stay light on phones, and switch off with reduced motion.`),
       effectRow,
@@ -454,7 +461,7 @@ function renderEditor(app, profile, persistedUsername, session, demo) {
     previewHost
   ]);
 
-  app.replaceChildren(el("div", { class: "ed-shell" }, [
+  app.replaceChildren(el("div", { class: "ed-shell", id: "editor-shell" }, [
     header,
     el("div", { class: "ed-layout" }, [
       el("div", { class: "ed-main" }, [form]),
