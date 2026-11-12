@@ -2,6 +2,7 @@
   {
     "id": "splash-01",
     "file": "splash-01.webp",
+    "thumb": "thumbs/splash-01.webp",
     "name": "Neon Ghost",
     "tags": [
       "neon",
@@ -15,6 +16,7 @@
   {
     "id": "splash-02",
     "file": "splash-02.webp",
+    "thumb": "thumbs/splash-02.webp",
     "name": "Purple Nebula",
     "tags": [
       "space",
@@ -28,6 +30,7 @@
   {
     "id": "splash-03",
     "file": "splash-03.webp",
+    "thumb": "thumbs/splash-03.webp",
     "name": "Cyberpunk Rain",
     "tags": [
       "cyberpunk",
@@ -41,6 +44,7 @@
   {
     "id": "splash-04",
     "file": "splash-04.webp",
+    "thumb": "thumbs/splash-04.webp",
     "name": "Glitch Void",
     "tags": [
       "glitch",
@@ -54,6 +58,7 @@
   {
     "id": "splash-05",
     "file": "splash-05.webp",
+    "thumb": "thumbs/splash-05.webp",
     "name": "Aurora",
     "tags": [
       "aurora",
@@ -67,6 +72,7 @@
   {
     "id": "splash-06",
     "file": "splash-06.webp",
+    "thumb": "thumbs/splash-06.webp",
     "name": "Sakura Night",
     "tags": [
       "japan",
@@ -80,6 +86,7 @@
   {
     "id": "splash-07",
     "file": "splash-07.webp",
+    "thumb": "thumbs/splash-07.webp",
     "name": "Liquid Chrome",
     "tags": [
       "chrome",
@@ -93,6 +100,7 @@
   {
     "id": "splash-08",
     "file": "splash-08.webp",
+    "thumb": "thumbs/splash-08.webp",
     "name": "Red Embers",
     "tags": [
       "embers",
@@ -106,6 +114,7 @@
   {
     "id": "splash-09",
     "file": "splash-09.webp",
+    "thumb": "thumbs/splash-09.webp",
     "name": "Bioluminescence",
     "tags": [
       "ocean",
@@ -119,6 +128,7 @@
   {
     "id": "splash-10",
     "file": "splash-10.webp",
+    "thumb": "thumbs/splash-10.webp",
     "name": "Synthwave",
     "tags": [
       "synthwave",
@@ -132,6 +142,7 @@
   {
     "id": "splash-11",
     "file": "splash-11.webp",
+    "thumb": "thumbs/splash-11.webp",
     "name": "Crystal Cave",
     "tags": [
       "crystal",
@@ -145,6 +156,7 @@
   {
     "id": "splash-12",
     "file": "splash-12.webp",
+    "thumb": "thumbs/splash-12.webp",
     "name": "Dark Bokeh",
     "tags": [
       "minimal",
@@ -158,6 +170,7 @@
   {
     "id": "splash-13",
     "file": "splash-13.webp",
+    "thumb": "thumbs/splash-13.webp",
     "name": "Haunted Forest",
     "tags": [
       "forest",
@@ -171,6 +184,7 @@
   {
     "id": "splash-14",
     "file": "splash-14.webp",
+    "thumb": "thumbs/splash-14.webp",
     "name": "Gold Marble",
     "tags": [
       "marble",
@@ -184,6 +198,7 @@
   {
     "id": "splash-15",
     "file": "splash-15.webp",
+    "thumb": "thumbs/splash-15.webp",
     "name": "Vaporwave Palms",
     "tags": [
       "vaporwave",
@@ -197,6 +212,7 @@
   {
     "id": "splash-16",
     "file": "splash-16.webp",
+    "thumb": "thumbs/splash-16.webp",
     "name": "Holographic",
     "tags": [
       "holographic",
@@ -210,6 +226,7 @@
   {
     "id": "splash-17",
     "file": "splash-17.webp",
+    "thumb": "thumbs/splash-17.webp",
     "name": "Anime Night Sky",
     "tags": [
       "anime",
@@ -223,6 +240,7 @@
   {
     "id": "splash-18",
     "file": "splash-18.webp",
+    "thumb": "thumbs/splash-18.webp",
     "name": "Lava Cave",
     "tags": [
       "lava",
@@ -236,6 +254,7 @@
   {
     "id": "splash-19",
     "file": "splash-19.webp",
+    "thumb": "thumbs/splash-19.webp",
     "name": "Rainy Window",
     "tags": [
       "rain",
@@ -249,6 +268,7 @@
   {
     "id": "splash-20",
     "file": "splash-20.webp",
+    "thumb": "thumbs/splash-20.webp",
     "name": "Black Hole",
     "tags": [
       "space",
