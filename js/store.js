@@ -109,9 +109,21 @@ export async function currentSession() {
 export async function signInWithDiscord() {
   const supabase = await getClient();
   const redirectTo = editorRedirectUrl(window.location.origin, window.location.pathname, window.location.hostname);
+  // Discord's provider config already asks for identify and email.
+  // Passing them again repeats the scopes on the authorize URL.
+  // Clearing storage locally avoids a POST /logout that 401s when no one is signed in.
+  try {
+    const keys = [];
+    for (let i = 0; i < localStorage.length; i += 1) keys.push(localStorage.key(i));
+    for (const key of keys) {
+      if (key && key.startsWith("sb-") && (key.endsWith("-auth-token") || key.endsWith("-code-verifier"))) {
+        localStorage.removeItem(key);
+      }
+    }
+  } catch { /* private mode */ }
   const { error } = await supabase.auth.signInWithOAuth({
     provider: "discord",
-    options: { redirectTo, scopes: "identify email" }
+    options: { redirectTo }
   });
   if (error) throw error;
 }

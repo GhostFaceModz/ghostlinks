@@ -242,6 +242,7 @@ textarea.ed-input { min-height: 96px; resize: vertical; }
   .ed-row-actions { grid-column: 2; }
 }
 @media (max-width: 979px) {
+  .ed-shell { padding-bottom: 96px; }
   .ed-preview { display: none; }
   .ed-preview.is-open {
     display: flex; flex-direction: column; position: fixed; z-index: 40;

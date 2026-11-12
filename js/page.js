@@ -1,8 +1,8 @@
 import { el } from "./dom.js";
 import { svgIcon } from "./icons.js";
 import { FONTS, THEMES, normalizeProfile } from "./model.js";
-import { EFFECTS } from "./looks.js";
-import { mountBackground } from "./effects.js";
+import { EFFECTS, activeBackdrop } from "./looks.js";
+import { mountBackdrop } from "./backdrops.js";
 import { mountOverlays } from "./overlays.js";
 import { bindPlayer } from "./player.js";
 import { homeHref, siteBase } from "./route.js";
@@ -281,10 +281,13 @@ export function mountPage(container, rawProfile, options = {}) {
   }
 
   function syncBackground() {
-    if (profile.background === backgroundName && backgroundApi) return;
+    const id = activeBackdrop(profile);
+    const media = profile.settings?.background_media || "";
+    const key = `${id}|${media}`;
+    if (key === backgroundName && backgroundApi) return;
     backgroundApi?.stop();
-    backgroundName = profile.background;
-    backgroundApi = mountBackground(scene, backgroundName);
+    backgroundName = key;
+    backgroundApi = mountBackdrop(scene, id, media);
     backgroundApi.setMotion(motionOn);
   }
 

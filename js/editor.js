@@ -1,7 +1,6 @@
 import { el } from "./dom.js";
 import { svgIcon } from "./icons.js";
 import {
-  BACKGROUNDS,
   FONTS,
   LIMITS,
   THEMES,
@@ -11,9 +10,10 @@ import {
   platformLabel,
   safeAvatar
 } from "./model.js";
-import { MAX_EFFECTS, normalizeSettings } from "./looks.js";
+import { MAX_EFFECTS, activeBackdrop, normalizeSettings } from "./looks.js";
 import { mountEffectCards, mountSplashCards, toggleEffect } from "./market.js";
 import { mountLogoPicker } from "./logo-picker.js";
+import { mountBackdropCards, readBackdropFile } from "./backdrops.js";
 import { mountSplashGallery } from "./splash-gallery.js";
 import { mountPage } from "./page.js";
 import { bindRadioGroup } from "./radios.js";
@@ -213,17 +213,29 @@ function renderEditor(app, profile, persistedUsername, session, demo) {
   }
   bindRadioGroup(themeRow);
 
-  const bgRow = el("div", { class: "choice-row", role: "radiogroup", "aria-label": "Background" });
-  for (const [id, item] of Object.entries(BACKGROUNDS)) {
-    const button = el("button", { type: "button", class: "choice", role: "radio", "aria-checked": String(profile.background === id) }, item.label);
-    button.title = item.hint;
-    button.addEventListener("click", () => {
-      profile.background = id;
+  if (!profile.settings.background) profile.settings.background = activeBackdrop(profile);
+  const bgRow = el("div", { role: "group", "aria-label": "Background" });
+  mountBackdropCards(bgRow, profile, (id, column) => {
+    profile.settings.background = id;
+    profile.settings.background_media = "";
+    profile.background = column;
+    status.textContent = "";
+    refresh();
+  });
+  const bgFile = el("input", { id: "backdrop-file", class: "ed-file", type: "file", accept: "image/gif,video/webm,video/mp4" });
+  bgFile.addEventListener("change", async () => {
+    const chosen = bgFile.files && bgFile.files[0];
+    if (!chosen) return;
+    try {
+      profile.settings.background_media = await readBackdropFile(chosen);
+      profile.settings.background = "custom";
+      profile.background = "still";
+      status.textContent = "";
       refresh();
-    });
-    bgRow.append(button);
-  }
-  bindRadioGroup(bgRow);
+    } catch (error) {
+      status.textContent = error.message || "Couldn't use that background.";
+    }
+  });
 
   const splashRow = el("div", { role: "radiogroup", "aria-label": "Click-to-enter style" });
   mountSplashCards(splashRow, profile, (id) => {
@@ -235,6 +247,7 @@ function renderEditor(app, profile, persistedUsername, session, demo) {
   const logoPicker = el("div", { class: "logo-picker" });
   mountLogoPicker(logoPicker, profile, (value) => {
     profile.settings.logo_image = value;
+    status.textContent = "";
     refresh();
   }, (message) => { status.textContent = message; });
 
@@ -393,7 +406,10 @@ function renderEditor(app, profile, persistedUsername, session, demo) {
       el("p", { class: "ed-label" }, "Theme"),
       themeRow,
       el("p", { class: "ed-label" }, "Background"),
+      el("p", { class: "ed-hint" }, "Plays behind the card after you enter. It follows the accent colour and holds still when motion is off."),
       bgRow,
+      el("label", { class: "ed-file-label", for: "backdrop-file" }, "Or a short GIF or video, under 130 KB"),
+      bgFile,
       el("p", { class: "ed-label" }, "Click-to-enter style"),
       splashRow,
       el("p", { class: "ed-label" }, "Ghost mark"),

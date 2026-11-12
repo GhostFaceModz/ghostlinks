@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import test from "node:test";
-import { EFFECTS, GIF_RAW_MAX, MAX_EFFECTS, SPLASHES, normalizeLogoImage, normalizeSettings, normalizeSplashImage, splashFullPath, splashPreviewPath } from "../js/looks.js";
+import { BACKDROPS, EFFECTS, GIF_RAW_MAX, MAX_EFFECTS, SPLASHES, activeBackdrop, normalizeLogoImage, normalizeSettings, normalizeSplashImage, splashFullPath, splashPreviewPath } from "../js/looks.js";
 import { demoProfile } from "../js/model.js";
 
 test("there are at least 12 splashes and 15 effects", () => {
@@ -70,6 +70,23 @@ test("gallery thumbs stay small and GIFs fit the saved data URL", () => {
   assert.equal(splashFullPath({ file: "splash-04.webp" }), "assets/splash/splash-04.webp");
   assert.equal(splashPreviewPath({ file: "https://evil.example/a.webp", thumb: "splash-01.webp" }), "");
   assert.equal(splashPreviewPath({ file: "splash-01.webp", thumb: "../secret.webp" }), "assets/splash/thumbs/splash-01.webp");
+});
+
+test("animated backgrounds are known ids behind the card", () => {
+  assert.ok(BACKDROPS.length >= 12);
+  assert.equal(new Set(BACKDROPS.map((item) => item.id)).size, BACKDROPS.length);
+  const settings = normalizeSettings({ background: "starfield", background_media: "https://evil.example/a.mp4" });
+  assert.equal(settings.background, "starfield");
+  assert.equal(settings.background_media, "");
+  assert.equal(normalizeSettings({ background: "nope" }).background, "");
+  assert.equal(activeBackdrop({ background: "stars", settings: {} }), "starfield");
+  assert.equal(activeBackdrop({ background: "grid", settings: { background: "plasma" } }), "plasma");
+  const sql = fs.readFileSync(new URL("../supabase/migrations/20261112120000_ghostlinks_animated_background_guard.sql", import.meta.url), "utf8");
+  for (const item of BACKDROPS) assert.match(sql, new RegExp(`'${item.id}'`));
+  assert.match(sql, /background_media/);
+  assert.match(sql, /logo_image/);
+  assert.doesNotMatch(sql, /alter table public\.profiles/);
+  assert.doesNotMatch(sql, /drop table/i);
 });
 
 test("the demo page turns on a splash and several effects", () => {

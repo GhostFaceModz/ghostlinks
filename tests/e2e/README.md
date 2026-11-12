@@ -13,7 +13,5 @@ EXPECT_SHA=<sha> npm test       # first wait until the live site serves <sha> (w
 - `phone` uses `devices['iPhone 13']` (on Chromium). Overflow is measured against
   `documentElement.clientWidth`, because `innerWidth` grows with overflow on mobile.
 - Same-origin responses >= 400 fail a test. Third-party ones are logged as annotations.
-- `specs/open-bugs.spec.js`: tests marked `knownBug(...)` (Playwright `test.fail`) are
-  open bugs. They pass while the bug exists and fail ("expected to fail, but passed")
-  once it is fixed. Then delete that `knownBug` line.
+- `specs/open-bugs.spec.js` keeps the round-2 checks. Those bugs are fixed, so the specs expect a pass.
 - No retries, so flaky tests show up.

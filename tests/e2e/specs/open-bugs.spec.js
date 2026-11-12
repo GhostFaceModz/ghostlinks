@@ -1,8 +1,6 @@
 /*
  * Checks for the QA findings from the GhostLinks round-2 audit.
- * Tests wrapped in knownBug() are EXPECTED TO FAIL until the bug is fixed:
- * CI stays green while the bug is open, and turns red ("expected to fail, but passed")
- * once it is fixed. When that happens, delete the knownBug(...) line for that test.
+ * The bugs those checks covered are fixed, so the specs now expect a pass.
  */
 import { expect, test } from "@playwright/test";
 import {
@@ -16,11 +14,6 @@ import {
 import { imageSize } from "../helpers/image-size.js";
 
 const SPLASH_MAX_BYTES = 300 * 1024;
-
-/** Mark a test as a known open bug (TODO: remove once fixed). */
-function knownBug(description) {
-  test.fail(true, `Known open bug: ${description}`);
-}
 
 const isYouTube = (url) => {
   try {
