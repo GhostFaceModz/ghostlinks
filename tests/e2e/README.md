@@ -14,4 +14,7 @@ EXPECT_SHA=<sha> npm test       # first wait until the live site serves <sha> (w
   `documentElement.clientWidth`, because `innerWidth` grows with overflow on mobile.
 - Same-origin responses >= 400 fail a test. Third-party ones are logged as annotations.
 - `specs/open-bugs.spec.js` keeps the round-2 checks. Those bugs are fixed, so the specs expect a pass.
+- `specs/contrast.spec.js` measures WCAG text contrast (gate 4.5:1) of the entrance and profile card text
+  over the lightest splashes (20, 26, 15, 23, 31) and backdrops (lava, aurora, fog), at 390px and 1440px.
+  It samples real pixels (axe marks text over images "incomplete"). Each run logs `[contrast]` lines with ratios.
 - No retries, so flaky tests show up.
