@@ -125,7 +125,15 @@ function clearStaleAuth() {
   } catch { /* private mode */ }
 }
 
+export function facebookSignInEnabled() {
+  const raw = (typeof window !== "undefined" && window.GHOSTLINKS_CONFIG) || {};
+  return raw.FACEBOOK_ENABLED === true;
+}
+
 export async function signInWithProvider(provider) {
+  if (provider === "facebook" && !facebookSignInEnabled()) {
+    throw new Error("Facebook sign-in is turned off.");
+  }
   const supabase = await getClient();
   clearStaleAuth();
   const { error } = await supabase.auth.signInWithOAuth({

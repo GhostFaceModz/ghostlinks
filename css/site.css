@@ -72,7 +72,7 @@ button { cursor: pointer; }
 :focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
 .gl-page .enter-button:focus-visible { outline: none; }
 .gl-page .enter-button:focus-visible .enter-tag { outline: 2px solid #fff; outline-offset: 4px; }
-.sr {
+.sr, .sr-only {
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
   overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
 }
@@ -163,6 +163,7 @@ button { cursor: pointer; }
   font-weight: 650; font-size: 15px; cursor: pointer;
 }
 .auth-btn:disabled { opacity: .6; }
+.auth-btn[hidden] { display: none; }
 .auth-google { background: #fff; color: #1f1f1f; }
 .auth-discord { background: #5865f2; color: #fff; }
 .auth-twitch { background: #9146ff; color: #fff; }
