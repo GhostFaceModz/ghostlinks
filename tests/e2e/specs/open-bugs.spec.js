@@ -13,6 +13,7 @@ import {
   watchPage,
   YOUTUBE_HOSTS,
 } from "../helpers/index.js";
+import { imageSize } from "../helpers/image-size.js";
 
 const SPLASH_MAX_BYTES = 300 * 1024;
 
@@ -147,6 +148,28 @@ test.describe("images", () => {
     );
     big.sort();
     expect(big, `splash images >= 300 KB:\n${big.join("\n")}`).toEqual([]);
+  });
+
+  test("each manifest splash image is at most 1920px wide and under 250 KB", async ({ request }) => {
+    test.skip(test.info().project.name !== "desktop", "HTTP checks only need to run once");
+    const MAX_WIDTH = 1920;
+    const MAX_BYTES = 250 * 1024;
+    const items = await (await request.get(appUrl("assets/splash/manifest.json"))).json();
+    const bad = [];
+    await Promise.all(
+      items.map(async (item) => {
+        const res = await request.get(appUrl(`assets/splash/${item.file}`));
+        const body = await res.body();
+        const size = imageSize(body);
+        const bits = [];
+        if (!size) bits.push("unreadable image header");
+        else if (size.width > MAX_WIDTH) bits.push(`${size.width}x${size.height}`);
+        if (body.length >= MAX_BYTES) bits.push(`${Math.round(body.length / 1024)} KB`);
+        if (bits.length) bad.push(`${item.file}: ${bits.join(", ")}`);
+      })
+    );
+    bad.sort();
+    expect(bad, `splash images over 1920px wide or >= 250 KB:\n${bad.join("\n")}`).toEqual([]);
   });
 });
 
