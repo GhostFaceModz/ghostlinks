@@ -220,8 +220,19 @@ export function normalizeProfile(input = {}) {
     published: input.published !== false,
     settings: normalizeSettings(input.settings),
     links,
-    tracks
+    tracks,
+    discordUserId: /^[0-9]{17,20}$/.test(String(input.discordUserId || "")) ? String(input.discordUserId) : "",
+    discordName: clip(input.discordName, 32)
   };
+}
+
+export function profileBadges(profile) {
+  const badges = [];
+  if (profile.discordUserId || (profile.links || []).some((link) => link.platform === "discord")) badges.push({ id: "discord", label: "Discord" });
+  if ((profile.tracks || []).length) badges.push({ id: "music", label: "Music" });
+  if ((profile.settings?.effects || []).length) badges.push({ id: "motion", label: "Motion" });
+  if ((profile.links || []).length >= 3) badges.push({ id: "links", label: "Links" });
+  return badges;
 }
 
 /** Editor-facing checks. Blank link/track rows are ignored; half-finished ones are errors. */
@@ -271,6 +282,8 @@ export function demoProfile() {
     font: "unbounded",
     enterScreen: true,
     published: true,
+    discordUserId: "100000000000000001",
+    discordName: "ghostlink",
     settings: { splash: "portal", effects: ["fireflies", "ghosts", "glow", "rainbow", "visualiser", "aurora"] },
     links: [
       { url: "https://ghostflix.uk", label: "GhostFlix", platform: "custom" },

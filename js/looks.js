@@ -147,14 +147,27 @@ export function normalizeSettings(input = {}) {
   let background = normalizeBackdrop(input.background);
   if (background === "custom" && !background_media) background = "";
   if (!background && background_media) background = "custom";
-  const frame = String(input.avatar_frame || "").trim().toLowerCase();
   return {
     splash,
     effects,
     splash_image: normalizeSplashImage(input.splash_image),
     logo_image: normalizeLogoImage(input.logo_image),
-    avatar_frame: FRAME_ID.test(frame) ? frame : "",
+    avatar_frame: normalizeAvatarFrame(input.avatar_frame),
     background,
     background_media
   };
 }
+
+export function normalizeAvatarFrame(value) {
+  const raw = String(value || "").trim().toLowerCase();
+  return FRAME_ID.test(raw) ? raw : "";
+}
+
+export const TEMPLATES = [
+  { id: "portal", name: "Portal night", theme: "nebula", background: "aurora", accent: "#8f6cff", splash: "portal", splash_image: "assets/splash/splash-01.webp", effects: ["fireflies", "glow", "aurora", "rainbow"] },
+  { id: "signal", name: "Void signal", theme: "void", background: "grid", accent: "#c4b5fd", splash: "glitch", splash_image: "assets/splash/splash-08.webp", effects: ["glitch", "rain", "stars"] },
+  { id: "frost", name: "Frost glass", theme: "frost", background: "stars", accent: "#36c8ff", splash: "dissolve", splash_image: "assets/splash/splash-12.webp", effects: ["snow", "stars", "glow"] },
+  { id: "rose", name: "Rose bloom", theme: "rose", background: "rain", accent: "#ff6ad5", splash: "floatin", splash_image: "assets/splash/splash-05.webp", effects: ["sakura", "sparkle", "rainbow"] },
+  { id: "ember", name: "Ember burst", theme: "ember", background: "embers", accent: "#ff7a3c", splash: "burst", splash_image: "assets/splash/splash-16.webp", effects: ["sparkle", "glow", "trail"] },
+  { id: "mint", name: "Mint drift", theme: "mint", background: "aurora", accent: "#3ee0b0", splash: "smoke", splash_image: "assets/splash/splash-20.webp", effects: ["bubbles", "aurora", "visualiser"] }
+];

@@ -112,6 +112,7 @@ export function mountBackdropCards(container, profile, onPick) {
     const button = el("button", {
       type: "button",
       class: "market-card",
+      "data-backdrop": item.id,
       "aria-pressed": String(pressed)
     }, [
       stage,

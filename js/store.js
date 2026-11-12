@@ -49,7 +49,9 @@ export function fromRow(row) {
     published: row.published !== false,
     settings: row.settings && typeof row.settings === "object" ? row.settings : {},
     links: Array.isArray(row.links) ? row.links.map((link) => ({ ...link })) : [],
-    tracks: editorTracks(row.youtube_tracks)
+    tracks: editorTracks(row.youtube_tracks),
+    discordUserId: /^[0-9]{17,20}$/.test(String(row.discord_user_id || "")) ? String(row.discord_user_id) : "",
+    discordName: ""
   };
 }
 
@@ -134,7 +136,7 @@ export async function signOut() {
 }
 
 const PROFILES = "ghostlinks_profiles";
-const PROFILE_COLUMNS = "username,display_name,bio,avatar_url,theme,background,accent_color,font,links,youtube_tracks,enter_screen,published,settings";
+const PROFILE_COLUMNS = "username,display_name,bio,avatar_url,theme,background,accent_color,font,links,youtube_tracks,enter_screen,published,settings,discord_user_id";
 
 export async function loadOwn(session) {
   if (isDemoMode() || !session) {
@@ -216,4 +218,52 @@ export async function saveProfile(raw, session) {
     throw new Error(error.message || "Couldn't save your page.");
   }
   return clean;
+}
+
+function viewerKey() {
+  const storageKey = "ghostlinks.viewer";
+  try {
+    const existing = localStorage.getItem(storageKey) || "";
+    if (/^[A-Za-z0-9_-]{16,64}$/.test(existing)) return existing;
+    const next = (crypto.randomUUID() + crypto.randomUUID()).replace(/-/g, "").slice(0, 32);
+    localStorage.setItem(storageKey, next);
+    return next;
+  } catch {
+    return "localviewerkey00000001";
+  }
+}
+
+function localView(username) {
+  const countKey = `ghostlinks.views.${username}`;
+  const seenKey = `ghostlinks.viewed.${username}`;
+  let count = 0;
+  try {
+    const stored = Number(localStorage.getItem(countKey));
+    count = Number.isSafeInteger(stored) && stored > 0 ? stored : 0;
+    const seen = Number(localStorage.getItem(seenKey));
+    if (Number.isFinite(seen) && Date.now() - seen < 6 * 60 * 60 * 1000) return count || 0;
+    count += 1;
+    localStorage.setItem(countKey, String(count));
+    localStorage.setItem(seenKey, String(Date.now()));
+  } catch {
+    count = Math.max(count, 1);
+  }
+  return count;
+}
+
+export async function recordView(username) {
+  const name = String(username || "").trim().toLowerCase();
+  if (!name) return 0;
+  if (isDemoMode() || name === "demo") return localView(name);
+  try {
+    const supabase = await getClient();
+    const { data, error } = await supabase.rpc("ghostlinks_record_view", {
+      page_name: name,
+      viewer_key: viewerKey()
+    });
+    if (error || data == null) return localView(name);
+    return Number(data) || 0;
+  } catch {
+    return localView(name);
+  }
 }

@@ -1,11 +1,13 @@
 import { el } from "./dom.js";
 import { svgIcon } from "./icons.js";
-import { FONTS, THEMES, normalizeProfile } from "./model.js";
+import { FONTS, THEMES, normalizeProfile, profileBadges } from "./model.js";
 import { EFFECTS, activeBackdrop } from "./looks.js";
 import { mountBackdrop } from "./backdrops.js";
+import { frameSrc, loadFrameManifest } from "./frames.js";
 import { mountOverlays } from "./overlays.js";
 import { bindPlayer } from "./player.js";
 import { homeHref, siteBase } from "./route.js";
+import { recordView } from "./store.js";
 
 const NS = "http://www.w3.org/2000/svg";
 
@@ -98,7 +100,7 @@ export function mountPage(container, rawProfile, options = {}) {
   let overlayApi = null;
   let typeTimer = 0;
   let typedKey = "";
-  const counted = options.countView && profile.username ? bumpViews(profile.username) : readViews(profile.username);
+  const counted = profile.username ? readViews(profile.username) : 0;
 
   const page = el("div", {
     class: `gl-page ${options.preview ? "is-preview" : "is-live"}`,
@@ -131,15 +133,20 @@ export function mountPage(container, rawProfile, options = {}) {
   );
 
   const motionButton = el("button", { class: "motion-button", type: "button" }, [svgIcon("motion"), el("span", {}, "Motion")]);
+  const soundButton = el("button", { class: "motion-button sound-pill", type: "button", "aria-pressed": "false" }, [svgIcon("sound"), el("span", {}, "Sound")]);
   const brand = el("a", { class: "wordmark", href: homeHref() }, [svgIcon("ghost"), el("span", {}, ["GHOST", el("span", {}, "LINKS")])]);
   if (options.preview) brand.addEventListener("click", (event) => event.preventDefault());
-  const topbar = el("header", { class: "topbar" }, [brand, motionButton]);
+  const topbar = el("header", { class: "topbar" }, [brand, el("div", { class: "top-actions" }, [soundButton, motionButton])]);
 
   const banner = el("div", { class: "banner", "aria-hidden": "true" }, [el("span", { class: "banner-ghost" }, [svgIcon("ghost")]), el("span", { class: "banner-fade" })]);
   const avatarImg = el("img", { class: "avatar", alt: "", width: "128", height: "128" });
   const avatarFallback = el("span", { class: "avatar-fallback", "aria-hidden": "true" }, [svgIcon("ghost")]);
   const avatarWrap = el("div", { class: "avatar-wrap" }, [el("span", { class: "avatar-ring", "aria-hidden": "true" }), avatarImg, avatarFallback]);
   const cardLogo = el("img", { class: "card-logo", alt: "", hidden: true });
+  const frameImg = el("img", { class: "avatar-frame", alt: "", hidden: true });
+  avatarWrap.append(frameImg);
+  const badges = el("ul", { class: "badges" });
+  const presence = el("div", { class: "presence", hidden: true });
   const name = el("h1", { class: "profile-name" });
   const handle = el("p", { class: "handle" });
   const bio = el("p", { class: "bio" });
@@ -153,6 +160,8 @@ export function mountPage(container, rawProfile, options = {}) {
     banner,
     cardLogo,
     avatarWrap,
+    badges,
+    presence,
     name,
     handle,
     bio,
@@ -217,8 +226,63 @@ export function mountPage(container, rawProfile, options = {}) {
     }
     const views = profile.username ? (options.countView ? counted : readViews(profile.username)) : 0;
     viewCount.textContent = profile.username ? views.toLocaleString() : "–";
-    viewWords.textContent = views === 1 ? " visit on this device" : " visits on this device";
+    viewWords.textContent = views === 1 ? " visit" : " visits";
+    paintBadges();
+    paintPresence();
+    paintFrame();
     syncLook();
+  }
+
+  function paintBadges() {
+    badges.replaceChildren();
+    for (const badge of profileBadges(profile)) {
+      const chip = el("li", { class: `badge badge-${badge.id}` }, [
+        badge.id === "discord" ? el("span", { class: "online-dot", "aria-hidden": "true" }) : null,
+        svgIcon(badge.id === "music" ? "sound" : badge.id === "motion" ? "motion" : badge.id === "links" ? "link" : "discord"),
+        el("span", {}, badge.label)
+      ]);
+      badges.append(chip);
+    }
+    badges.hidden = badges.childElementCount === 0;
+  }
+
+  function paintPresence() {
+    const nameText = profile.discordName || profile.displayName || profile.username;
+    if (!profile.discordUserId || !nameText) {
+      presence.hidden = true;
+      presence.replaceChildren();
+      return;
+    }
+    presence.hidden = false;
+    const face = profile.avatarUrl
+      ? el("img", { class: "presence-avatar", alt: "", src: profile.avatarUrl, width: "40", height: "40" })
+      : el("span", { class: "presence-avatar presence-fallback", "aria-hidden": "true" }, [svgIcon("ghost")]);
+    presence.replaceChildren(
+      el("span", { class: "presence-face" }, [face, el("span", { class: "online-dot", "aria-hidden": "true" })]),
+      el("span", { class: "presence-name" }, nameText)
+    );
+  }
+
+  let frameTicket = 0;
+  function paintFrame() {
+    const id = profile.settings?.avatar_frame || "";
+    const ticket = ++frameTicket;
+    if (!id) {
+      frameImg.hidden = true;
+      frameImg.removeAttribute("src");
+      return;
+    }
+    loadFrameManifest().then((frames) => {
+      if (ticket !== frameTicket) return;
+      const match = frames.find((item) => item.id === id);
+      const src = frameSrc(match);
+      if (!src) {
+        frameImg.hidden = true;
+        return;
+      }
+      frameImg.src = src;
+      frameImg.hidden = false;
+    }).catch(() => { frameImg.hidden = true; });
   }
 
   function syncLook() {
@@ -364,6 +428,11 @@ export function mountPage(container, rawProfile, options = {}) {
       enter();
     }
   });
+  soundButton.addEventListener("click", () => {
+    const muted = playerApi?.toggleMute() === true;
+    soundButton.setAttribute("aria-pressed", String(muted));
+    soundButton.setAttribute("aria-label", muted ? "Unmute sound" : "Mute sound");
+  });
   motionButton.addEventListener("click", () => {
     if (reduced.matches) return;
     const next = !motionOn;
@@ -376,6 +445,13 @@ export function mountPage(container, rawProfile, options = {}) {
   syncBackground();
   paintCopy();
   setMotion(motionOn);
+  if (options.countView && profile.username) {
+    recordView(profile.username).then((count) => {
+      if (!Number.isFinite(count)) return;
+      viewCount.textContent = count.toLocaleString();
+      viewWords.textContent = count === 1 ? " visit" : " visits";
+    }).catch(() => {});
+  }
   if (profile.enterScreen && !entered) {
     setInert(experience, true);
     if (!options.preview) enterButton.focus({ preventScroll: true });
