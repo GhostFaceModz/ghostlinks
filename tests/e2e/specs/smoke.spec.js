@@ -23,7 +23,7 @@ test.describe("GhostLinks smoke", () => {
     expect(res.status(), "editor HTTP status").toBe(200);
     const card = page.getByRole("main");
     await expect(card.getByRole("heading", { name: "Sign in to build your page" })).toBeVisible({ timeout: 20_000 });
-    await expect(card.getByRole("button", { name: "Sign in with Discord" })).toBeVisible();
+    await expect(card.getByRole("button", { name: "Continue with Discord" })).toBeVisible();
     await shot(page, "editor-signin");
     watch.assertClean();
   });

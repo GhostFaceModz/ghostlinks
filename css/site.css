@@ -156,6 +156,24 @@ button { cursor: pointer; }
 .notice-card, .ed-gate {
   max-width: 520px; margin: 10vh auto; padding: 28px 20px; text-align: left;
 }
+.auth-providers, .auth-email-row { display: grid; gap: 10px; margin: 14px 0; }
+.auth-btn {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  width: 100%; min-height: 48px; border: 0; border-radius: 14px;
+  font-weight: 650; font-size: 15px; cursor: pointer;
+}
+.auth-btn:disabled { opacity: .6; }
+.auth-google { background: #fff; color: #1f1f1f; }
+.auth-discord { background: #5865f2; color: #fff; }
+.auth-twitch { background: #9146ff; color: #fff; }
+.auth-facebook { background: #1877f2; color: #fff; }
+.auth-email { background: #8f6cff; color: #fff; }
+.auth-or { display: flex; align-items: center; gap: 10px; margin: 4px 0 0; color: var(--muted); font-size: 12px; }
+.auth-or::before, .auth-or::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.auth-email-row input {
+  width: 100%; min-height: 44px; border-radius: 12px; border: 1px solid var(--line);
+  background: rgba(255,255,255,.04); color: inherit; padding: 0 12px;
+}
 .editor-gate {
   min-height: 28rem;
   background: rgba(18, 14, 34, .45);
