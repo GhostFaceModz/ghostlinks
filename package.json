@@ -1,0 +1,9 @@
+{
+  "name": "ghostlinks",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/",
+    "preview": "node tests/gh-server.js"
+  }
+}

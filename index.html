@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#8f6cff">
+  <meta name="description" content="GhostLinks — free, ad-free animated bio pages by GhostApps. Claim a username, pick a theme, and share ghostapps.org/username.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="GhostLinks">
+  <meta property="og:title" content="GhostLinks · Free animated bio pages">
+  <meta property="og:description" content="Free, ad-free animated bio pages by GhostApps. No code, no trackers.">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="GhostLinks · Free animated bio pages">
+  <meta name="twitter:description" content="Free, ad-free animated bio pages by GhostApps.">
+  <title>GhostLinks · Free animated bio pages</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="fonts/unbounded-700.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/inter-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/site.css">
+  <link rel="stylesheet" href="css/profile.css">
+  <script src="config.js"></script>
+  <script type="module" src="js/boot.js"></script>
+</head>
+<body>
+  <a class="skip" href="#content">Skip to content</a>
+  <div id="app">
+    <header class="land-header">
+      <a class="wordmark" href="./" aria-label="GhostLinks home"><span>GHOST<span>LINKS</span></span></a>
+      <nav class="land-nav" aria-label="Primary">
+        <a href="?u=demo">Demo</a>
+        <a id="nav-signin" href="editor.html">Create</a>
+      </nav>
+    </header>
+    <main class="land" id="content">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">GhostApps</p>
+          <h1>Animated bio pages, without the ads.</h1>
+          <p class="lede">GhostLinks is a free guns.lol-style page anyone can make. A click-to-enter ghost, a profile card, your links, and a YouTube player. Yours at ghostapps.org/username.</p>
+          <div class="land-actions">
+            <a class="land-button" href="editor.html">Create your page</a>
+            <a class="land-button land-button-quiet" href="?u=demo">View the demo</a>
+          </div>
+          <ul class="land-points">
+            <li>No ads</li>
+            <li>No trackers</li>
+            <li>No code</li>
+            <li>Free</li>
+          </ul>
+          <p id="mode-note" class="mode-note" hidden>Demo mode is on. The editor saves in this browser until Supabase is added to config.js.</p>
+        </div>
+        <article class="land-mock" aria-hidden="true">
+          <div class="land-mock-banner"></div>
+          <div class="land-mock-avatar"></div>
+          <h2>GhostLink</h2>
+          <p>@demo · click to enter</p>
+          <div class="land-mock-links"><span>Flix</span><span>Games</span><span>YT</span></div>
+        </article>
+      </section>
+      <h2 class="section-title">Example themes</h2>
+      <p class="lede">Same demo page, six looks. Open one, then click the ghost.</p>
+      <div class="themes">
+        <a class="theme-card" href="?u=demo&amp;theme=nebula&amp;bg=aurora"><i style="--c:#8f6cff"></i><strong>Nebula</strong><span>Aurora drift, accent #8f6cff</span></a>
+        <a class="theme-card" href="?u=demo&amp;theme=frost&amp;bg=stars"><i style="--c:#36c8ff"></i><strong>Frost</strong><span>Starfield</span></a>
+        <a class="theme-card" href="?u=demo&amp;theme=rose&amp;bg=rain"><i style="--c:#ff6ad5"></i><strong>Rose</strong><span>Light rain</span></a>
+        <a class="theme-card" href="?u=demo&amp;theme=ember&amp;bg=embers"><i style="--c:#ff7a3c"></i><strong>Ember</strong><span>Rising sparks</span></a>
+        <a class="theme-card" href="?u=demo&amp;theme=mint&amp;bg=grid"><i style="--c:#3ee0b0"></i><strong>Mint</strong><span>Quiet grid</span></a>
+        <a class="theme-card" href="?u=demo&amp;theme=void&amp;bg=still"><i style="--c:#c4b5fd"></i><strong>Void</strong><span>Still glow</span></a>
+      </div>
+      <h2 class="section-title">How it works</h2>
+      <div class="steps">
+        <article class="step"><strong>1. Claim a name</strong><span>Sign in with Discord when Supabase is connected, or try the editor in demo mode.</span></article>
+        <article class="step"><strong>2. Make it yours</strong><span>Avatar, bio, up to 10 links, a theme, a background, and up to 5 songs.</span></article>
+        <article class="step"><strong>3. Share the page</strong><span>Friends open ghostapps.org/username, click the ghost, and the card appears.</span></article>
+      </div>
+    </main>
+    <footer class="land-footer">
+      <span>Made with GhostApps</span>
+      <a href="https://ghostapps.org/" rel="noopener noreferrer">ghostapps.org</a>
+      <span>© <span id="year">2026</span></span>
+    </footer>
+  </div>
+  <noscript><p class="boot-note">JavaScript is required for the editor and for public pages. The introduction above still describes GhostLinks.</p></noscript>
+</body>
+</html>
