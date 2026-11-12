@@ -122,15 +122,15 @@
 .gl-page .progress, .gl-page .player-bottom { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
 .gl-page .progress span { width: 36px; font-size: 11px; color: var(--soft); font-variant-numeric: tabular-nums; }
 .gl-page .progress span:last-child { text-align: right; }
-.gl-page input[type="range"] { --progress: 0%; flex: 1; appearance: none; height: 4px; border-radius: 99px; background: linear-gradient(90deg, #efeaff var(--progress), #ffffff22 var(--progress)); }
+.gl-page input[type="range"] { --progress: 0%; flex: 1; appearance: none; height: 24px; border-radius: 99px; background: linear-gradient(90deg, #efeaff var(--progress), #ffffff22 var(--progress)); }
 .gl-page input[type="range"]::-webkit-slider-thumb { appearance: none; width: 14px; height: 14px; border-radius: 50%; background: #fff; }
 .gl-page .player-bottom { display: grid; grid-template-columns: 1fr auto auto; }
 .gl-page .volume-wrap { display: flex; align-items: center; gap: 6px; min-width: 0; }
 .gl-page .volume { max-width: 84px; }
 .gl-page .transport { display: flex; align-items: center; gap: 4px; }
-.gl-page .icon-button, .gl-page .play-button { width: 36px; height: 36px; border: 0; border-radius: 50%; display: grid; place-items: center; background: transparent; color: #efeaff; }
-.gl-page .play-button { width: 46px; height: 46px; background: #fff; color: #140e22; }
-.gl-page .yt-open { color: var(--muted); font-size: 12px; align-self: center; }
+.gl-page .icon-button, .gl-page .play-button { width: 44px; height: 44px; border: 0; border-radius: 50%; display: grid; place-items: center; background: transparent; color: #efeaff; }
+.gl-page .play-button { background: #fff; color: #140e22; }
+.gl-page .yt-open { color: var(--muted); font-size: 12px; align-self: center; display: inline-flex; align-items: center; min-height: 44px; padding: 0 8px; }
 .gl-page .cover-eq { position: absolute; right: 4px; bottom: 4px; display: flex; gap: 2px; height: 12px; align-items: flex-end; opacity: 0; }
 .gl-page.is-playing .cover-eq { opacity: 1; }
 .gl-page .cover-eq i { width: 2px; height: 100%; background: #fff; display: block; transform-origin: bottom; animation: eq 0.9s ease-in-out infinite; }

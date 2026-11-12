@@ -1,9 +1,12 @@
 /** Entrance image: a preset from assets/splash/manifest.json, or a compressed upload. */
 
 import { el } from "./dom.js";
+import { DATA_IMAGE_MAX, GIF_RAW_MAX, normalizeSplashImage, splashFullPath, splashPreviewPath } from "./looks.js";
+import { bindRadioGroup } from "./radios.js";
 import { siteBase } from "./route.js";
 
 const MAX_DATA = 160000;
+const GIF_LIMIT = `GIFs need to be under ${Math.round(GIF_RAW_MAX / 1000)} KB. Larger files are rejected when the page is saved.`;
 
 export async function loadSplashManifest() {
   try {
@@ -23,8 +26,12 @@ export function presetPath(file) {
 
 export function compressSplashFile(file) {
   if (file.type === "image/gif") {
-    if (file.size > 200000) return Promise.reject(new Error("GIFs need to be under 200 KB so the page stays fast."));
-    return readFile(file);
+    if (file.size > GIF_RAW_MAX) return Promise.reject(new Error(GIF_LIMIT));
+    return readFile(file).then((data) => {
+      if (!normalizeSplashImage(data)) throw new Error(GIF_LIMIT);
+      if (data.length > DATA_IMAGE_MAX) throw new Error(GIF_LIMIT);
+      return data;
+    });
   }
   if (!/^image\/(png|jpeg|webp)$/.test(file.type)) {
     return Promise.reject(new Error("Use a PNG, JPEG, WebP, or GIF."));
@@ -75,7 +82,7 @@ export async function mountSplashGallery(container, profile, onChange, onError) 
   const images = await loadSplashManifest();
   const file = el("input", { type: "file", accept: "image/png,image/jpeg,image/webp,image/gif", id: "splash-file", class: "ed-file" });
   const note = el("p", { class: "ed-hint", id: "splash-note" });
-  const grid = el("div", { class: "splash-presets", role: "listbox", "aria-label": "Preset entrance images" });
+  const grid = el("div", { class: "splash-presets", role: "radiogroup", "aria-label": "Preset entrance images" });
   const none = presetButton("None", "", !profile.settings.splash_image);
   none.addEventListener("click", () => choose(""));
   grid.append(none);
@@ -84,11 +91,28 @@ export async function mountSplashGallery(container, profile, onChange, onError) 
   }
   for (const item of images) {
     const path = presetPath(item.file);
+    const full = splashFullPath(item);
+    const preview = splashPreviewPath(item);
+    if (!path || !preview) continue;
     const button = presetButton(item.name || item.label || item.file, path, profile.settings.splash_image === path);
     if (Array.isArray(item.tags) && item.tags.length) button.title = item.tags.slice(0, 4).join(" · ");
-    const img = el("img", { alt: "", src: `${siteBase()}${path}` });
+    const img = el("img", {
+      alt: "",
+      src: `${siteBase()}${preview}`,
+      loading: "lazy",
+      decoding: "async",
+      width: "320",
+      height: "180"
+    });
     const fallback = el("span", { class: "preset-fallback", "aria-hidden": "true" });
-    img.addEventListener("error", () => { img.hidden = true; });
+    img.addEventListener("error", () => {
+      if (full && img.dataset.full !== "1" && preview !== full) {
+        img.dataset.full = "1";
+        img.src = `${siteBase()}${full}`;
+        return;
+      }
+      img.hidden = true;
+    });
     button.prepend(fallback, img);
     button.addEventListener("click", () => choose(path));
     grid.append(button);
@@ -105,11 +129,19 @@ export async function mountSplashGallery(container, profile, onChange, onError) 
     }
   });
   function choose(value) {
-    onChange(value);
+    const clean = value ? normalizeSplashImage(value) : "";
+    if (value && !clean) {
+      onError(GIF_LIMIT);
+      return;
+    }
+    onChange(clean);
     grid.querySelectorAll(".splash-preset").forEach((node) => {
-      node.setAttribute("aria-selected", String(node.dataset.path === value));
+      const on = node.dataset.path === clean;
+      node.setAttribute("aria-checked", on ? "true" : "false");
+      node.tabIndex = on ? 0 : -1;
     });
   }
+  bindRadioGroup(grid);
   container.replaceChildren(
     el("label", { class: "ed-file-label", for: "splash-file" }, "Upload an image or GIF"),
     file,
@@ -122,8 +154,8 @@ function presetButton(label, path, selected) {
   return el("button", {
     type: "button",
     class: "splash-preset",
-    role: "option",
+    role: "radio",
     "data-path": path,
-    "aria-selected": String(selected)
+    "aria-checked": String(selected)
   }, [el("span", {}, label)]);
 }

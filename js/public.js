@@ -1,5 +1,5 @@
 import { el } from "./dom.js";
-import { BACKGROUNDS, THEMES } from "./model.js";
+import { BACKGROUNDS, THEMES, validateUsername } from "./model.js";
 import { mountPage } from "./page.js";
 import { editorHref, homeHref, siteBase } from "./route.js";
 import { loadPublic } from "./store.js";
@@ -16,6 +16,14 @@ function setMeta(attr, key, content) {
 
 export async function mountPublic(container, username, query = {}) {
   document.body.classList.add("mode-public");
+  if (username !== "demo") {
+    const check = validateUsername(username);
+    if (!check.ok && check.code !== "reserved") {
+      document.title = "Page not found · GhostLinks";
+      container.replaceChildren(invalidName());
+      return;
+    }
+  }
   container.replaceChildren(el("p", { class: "boot-note" }, "Opening this page…"));
   try {
     let profile = await loadPublic(username);
@@ -52,11 +60,25 @@ export async function mountPublic(container, username, query = {}) {
   }
 }
 
+function invalidName() {
+  return el("div", { class: "notice-card" }, [
+    el("p", { class: "eyebrow" }, "GhostLinks"),
+    el("h1", {}, "That isn't a valid name"),
+    el("p", {}, "Usernames start with a letter, then use letters, numbers, or underscores."),
+    el("div", { class: "land-actions" }, [
+      el("a", { class: "land-button", href: editorHref() }, "Create your page"),
+      el("a", { class: "land-button land-button-quiet", href: `${homeHref()}?u=demo` }, "View the demo")
+    ])
+  ]);
+}
+
 function missing(username) {
+  const check = validateUsername(username);
+  const named = check.ok || check.code === "reserved";
   return el("div", { class: "notice-card" }, [
     el("p", { class: "eyebrow" }, "GhostLinks"),
     el("h1", {}, "This ghost hasn't appeared yet"),
-    el("p", {}, `@${username || "unknown"} doesn't have a published page.`),
+    el("p", {}, named ? `@${check.username} doesn't have a published page.` : "That isn't a valid name."),
     el("div", { class: "land-actions" }, [
       el("a", { class: "land-button", href: editorHref() }, "Create your page"),
       el("a", { class: "land-button land-button-quiet", href: `${homeHref()}?u=demo` }, "View the demo")

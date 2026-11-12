@@ -140,14 +140,15 @@
 }
 .market-stage i { font-family: "Unbounded", sans-serif; font-style: normal; font-size: 18px; z-index: 1; }
 .market-stage b, .market-stage s { position: absolute; display: block; }
-.market-copy { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; padding: 0 4px 2px; }
-.market-copy strong { font-size: 13px; font-weight: 650; }
-.market-copy em { font-style: normal; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #b7b1cf; }
-.market-card[aria-pressed="true"] {
+.market-copy { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; padding: 0 4px 2px; min-width: 0; }
+.market-copy strong { font-size: 13px; font-weight: 650; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.market-copy em { font-style: normal; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #cfc8ea; }
+.market-card[aria-pressed="true"], .market-card[aria-checked="true"] {
   border-color: #d9ccff;
   box-shadow: 0 0 0 1px #d9ccff, 0 18px 40px -24px #8f6cff, inset 0 1px 0 #fff3;
 }
-.market-card[aria-pressed="true"] .market-copy em { color: #efe9ff; }
+.market-card:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+.market-card[aria-pressed="true"] .market-copy em, .market-card[aria-checked="true"] .market-copy em { color: #efe9ff; }
 @media (hover: hover) and (pointer: fine) {
   .market-card:hover { transform: translateY(-4px); border-color: rgba(201,184,255,.7); box-shadow: 0 18px 40px -22px #8f6cff; }
   .market-card { backdrop-filter: blur(14px); }

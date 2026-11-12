@@ -140,7 +140,8 @@ export function mountPage(container, rawProfile, options = {}) {
   const socials = el("nav", { class: "socials", "aria-label": "Links" });
   const music = musicShell();
   const viewCount = el("span", { class: "view-count" });
-  const viewLine = el("p", { class: "views", title: "Visits to this page in this browser. Not a server-wide total." }, [svgIcon("eye"), viewCount, " visits on this device"]);
+  const viewWords = document.createTextNode(" visits on this device");
+  const viewLine = el("p", { class: "views", title: "Visits to this page in this browser. Not a server-wide total." }, [svgIcon("eye"), viewCount, viewWords]);
   const card = el("article", { class: "card" }, [
     el("div", { class: "card-edge", "aria-hidden": "true" }),
     banner,
@@ -195,6 +196,7 @@ export function mountPage(container, rawProfile, options = {}) {
     }
     const views = profile.username ? (options.countView ? counted : readViews(profile.username)) : 0;
     viewCount.textContent = profile.username ? views.toLocaleString() : "–";
+    viewWords.textContent = views === 1 ? " visit on this device" : " visits on this device";
     syncLook();
   }
 

@@ -1,5 +1,19 @@
-import { isDemoMode, currentSession } from "./store.js";
+import { isDemoMode } from "./config-state.js";
 import { editorHref } from "./route.js";
+
+function hasStoredSession() {
+  try {
+    for (let index = 0; index < localStorage.length; index += 1) {
+      const key = localStorage.key(index) || "";
+      if (!key.startsWith("sb-") || !key.endsWith("-auth-token")) continue;
+      const raw = localStorage.getItem(key) || "";
+      if (raw.includes("access_token")) return true;
+    }
+  } catch {
+    /* private mode */
+  }
+  return false;
+}
 
 export async function initLanding() {
   const year = document.getElementById("year");
@@ -16,17 +30,8 @@ export async function initLanding() {
   }
   if (note) note.hidden = true;
   if (!signIn) return;
-  try {
-    const session = await currentSession();
-    if (session) {
-      signIn.textContent = "Your editor";
-      signIn.href = editorHref();
-    } else {
-      signIn.textContent = "Sign in";
-      signIn.href = editorHref();
-    }
-  } catch {
-    signIn.textContent = "Editor";
-    signIn.href = editorHref();
-  }
+  // Do not import store.js here. That module loads the Supabase client from jsDelivr.
+  // A stored auth token is enough to label the link; the editor checks the session itself.
+  signIn.textContent = hasStoredSession() ? "Your editor" : "Sign in";
+  signIn.href = editorHref();
 }

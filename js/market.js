@@ -2,6 +2,7 @@
 
 import { el } from "./dom.js";
 import { EFFECTS, MAX_EFFECTS, SPLASHES } from "./looks.js";
+import { bindRadioGroup } from "./radios.js";
 
 const reduced = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -16,8 +17,11 @@ function watch(cards) {
   cards.forEach((card) => observer.observe(card));
 }
 
-function cardShell(stageClass, label, tag, pressed) {
-  return el("button", { type: "button", class: "market-card", "aria-pressed": String(pressed) }, [
+function cardShell(stageClass, label, tag, pressed, radio) {
+  const state = radio
+    ? { role: "radio", "aria-checked": String(pressed) }
+    : { "aria-pressed": String(pressed) };
+  return el("button", { type: "button", class: "market-card", ...state }, [
     el("span", { class: `market-stage ${stageClass}`, "aria-hidden": "true" }, [
       el("i", {}, "Aa"),
       el("b"),
@@ -37,16 +41,13 @@ export function mountSplashCards(container, profile, onPick) {
   container.replaceChildren();
   container.classList.add("market-grid");
   for (const splash of SPLASHES) {
-    const button = cardShell(`mini-${splash.id}`, splash.label, splash.tag, profile.settings.splash === splash.id);
+    const button = cardShell(`mini-${splash.id}`, splash.label, splash.tag, profile.settings.splash === splash.id, true);
     button.title = splash.hint;
-    button.addEventListener("click", () => {
-      onPick(splash.id);
-      container.querySelectorAll(".market-card").forEach((node) => node.setAttribute("aria-pressed", "false"));
-      button.setAttribute("aria-pressed", "true");
-    });
+    button.addEventListener("click", () => onPick(splash.id));
     container.append(button);
     cards.push(button);
   }
+  bindRadioGroup(container);
   watch(cards);
 }
 

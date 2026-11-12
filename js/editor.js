@@ -15,6 +15,7 @@ import { MAX_EFFECTS, normalizeSettings } from "./looks.js";
 import { mountEffectCards, mountSplashCards, toggleEffect } from "./market.js";
 import { mountSplashGallery } from "./splash-gallery.js";
 import { mountPage } from "./page.js";
+import { bindRadioGroup } from "./radios.js";
 import { editorHref, homeHref, publicHref } from "./route.js";
 import {
   clearLocal,
@@ -199,31 +200,29 @@ function renderEditor(app, profile, persistedUsername, session, demo) {
 
   const themeRow = el("div", { class: "choice-row", role: "radiogroup", "aria-label": "Theme" });
   for (const [id, theme] of Object.entries(THEMES)) {
-    const button = el("button", { type: "button", class: "swatch", "aria-pressed": String(profile.theme === id) }, [
+    const button = el("button", { type: "button", class: "swatch", role: "radio", "aria-checked": String(profile.theme === id) }, [
       el("span", { class: "swatch-chip", style: `--swatch:${theme.accent};--swatch-base:${theme.base}` }),
       theme.label
     ]);
     button.addEventListener("click", () => {
       profile.theme = id;
-      themeRow.querySelectorAll(".swatch").forEach((node) => node.setAttribute("aria-pressed", "false"));
-      button.setAttribute("aria-pressed", "true");
       setAccent(theme.accent);
     });
     themeRow.append(button);
   }
+  bindRadioGroup(themeRow);
 
   const bgRow = el("div", { class: "choice-row", role: "radiogroup", "aria-label": "Background" });
   for (const [id, item] of Object.entries(BACKGROUNDS)) {
-    const button = el("button", { type: "button", class: "choice", "aria-pressed": String(profile.background === id) }, item.label);
+    const button = el("button", { type: "button", class: "choice", role: "radio", "aria-checked": String(profile.background === id) }, item.label);
     button.title = item.hint;
     button.addEventListener("click", () => {
       profile.background = id;
-      bgRow.querySelectorAll(".choice").forEach((node) => node.setAttribute("aria-pressed", "false"));
-      button.setAttribute("aria-pressed", "true");
       refresh();
     });
     bgRow.append(button);
   }
+  bindRadioGroup(bgRow);
 
   const splashRow = el("div", { role: "radiogroup", "aria-label": "Click-to-enter style" });
   mountSplashCards(splashRow, profile, (id) => {
@@ -249,15 +248,14 @@ function renderEditor(app, profile, persistedUsername, session, demo) {
 
   const fontRow = el("div", { class: "choice-row", role: "radiogroup", "aria-label": "Font" });
   for (const [id, font] of Object.entries(FONTS)) {
-    const button = el("button", { type: "button", class: "choice choice-font", style: `font-family:${font.display}`, "aria-pressed": String(profile.font === id) }, font.label);
+    const button = el("button", { type: "button", class: "choice choice-font", role: "radio", style: `font-family:${font.display}`, "aria-checked": String(profile.font === id) }, font.label);
     button.addEventListener("click", () => {
       profile.font = id;
-      fontRow.querySelectorAll(".choice").forEach((node) => node.setAttribute("aria-pressed", "false"));
-      button.setAttribute("aria-pressed", "true");
       refresh();
     });
     fontRow.append(button);
   }
+  bindRadioGroup(fontRow);
 
   function renderLinks() {
     linkList.replaceChildren();
@@ -461,12 +459,20 @@ function renderEditor(app, profile, persistedUsername, session, demo) {
     previewHost
   ]);
 
+  const previewToggle = el("button", { type: "button", class: "preview-fab", "aria-controls": "preview", "aria-expanded": "false" }, "Preview");
+  previewToggle.addEventListener("click", () => {
+    const open = previewColumn.classList.toggle("is-open");
+    previewToggle.setAttribute("aria-expanded", String(open));
+    previewToggle.textContent = open ? "Close preview" : "Preview";
+  });
+
   app.replaceChildren(el("div", { class: "ed-shell", id: "editor-shell" }, [
     header,
     el("div", { class: "ed-layout" }, [
       el("div", { class: "ed-main" }, [form]),
       previewColumn
-    ])
+    ]),
+    previewToggle
   ]));
 
   renderLinks();
