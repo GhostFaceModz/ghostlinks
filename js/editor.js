@@ -26,6 +26,7 @@ import {
   isDemoMode,
   loadOwn,
   saveProfile,
+  facebookSignInEnabled,
   signInWithMagicLink,
   signInWithProvider,
   signOut,
@@ -61,9 +62,15 @@ function wireSignIn(oauthError) {
   if (status && oauthError) status.textContent = oauthError;
   if (!card || card.dataset.wired === "true") return;
   card.dataset.wired = "true";
+  const facebookOn = facebookSignInEnabled();
   card.querySelectorAll("[data-provider]").forEach((button) => {
+    const provider = button.getAttribute("data-provider");
+    if (provider === "facebook" && !facebookOn) {
+      button.hidden = true;
+      return;
+    }
+    if (provider === "facebook") button.hidden = false;
     button.addEventListener("click", async () => {
-      const provider = button.getAttribute("data-provider");
       button.disabled = true;
       if (status) status.textContent = `Redirecting to ${provider}…`;
       try {

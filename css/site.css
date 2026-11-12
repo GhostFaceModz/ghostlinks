@@ -163,6 +163,7 @@ button { cursor: pointer; }
   font-weight: 650; font-size: 15px; cursor: pointer;
 }
 .auth-btn:disabled { opacity: .6; }
+.auth-btn[hidden] { display: none; }
 .auth-google { background: #fff; color: #1f1f1f; }
 .auth-discord { background: #5865f2; color: #fff; }
 .auth-twitch { background: #9146ff; color: #fff; }
