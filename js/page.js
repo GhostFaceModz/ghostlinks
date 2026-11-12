@@ -92,7 +92,7 @@ export function mountPage(container, rawProfile, options = {}) {
   let typeTimer = 0;
   let typedKey = "";
   let premiumAvatars = [];
-  const counted = profile.username ? readViews(profile.username) : 0;
+  let viewTotal = profile.username ? readViews(profile.username) : 0;
 
   const page = el("div", {
     class: `gl-page ${options.preview ? "is-preview" : "is-live"}`,
@@ -200,7 +200,7 @@ export function mountPage(container, rawProfile, options = {}) {
       cardLogo.src = mark;
       cardLogo.alt = "";
     } else cardLogo.removeAttribute("src");
-    const views = profile.username ? (options.countView ? counted : readViews(profile.username)) : 0;
+    const views = profile.username ? (options.countView ? viewTotal : readViews(profile.username)) : 0;
     viewCount.textContent = profile.username ? views.toLocaleString() : "–";
     viewWords.textContent = views === 1 ? " visit" : " visits";
     paintBadges();
@@ -427,6 +427,7 @@ export function mountPage(container, rawProfile, options = {}) {
   if (options.countView && profile.username) {
     recordView(profile.username).then((count) => {
       if (!Number.isFinite(count)) return;
+      viewTotal = count;
       viewCount.textContent = count.toLocaleString();
       viewWords.textContent = count === 1 ? " visit" : " visits";
     }).catch(() => {});
